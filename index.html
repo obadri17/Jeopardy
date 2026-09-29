@@ -416,6 +416,19 @@ kbd{font:600 .68rem var(--f);color:var(--dim);border:1px solid var(--hair);borde
 .suckstage.mg .suckans{color:#C9D1FF}
 .suckstage.mg .qdlink{color:rgba(200,210,255,.6)}
 .psuck.mgp{background:var(--gold-grad);-webkit-background-clip:text;background-clip:text}
+/* turns */
+.turnpick{align-items:center}
+.turnpick .tlab{font:800 .95rem/1 var(--fd);text-transform:uppercase;letter-spacing:.08em;color:var(--dim);margin-right:.3rem}
+.turnpick button,.swap button{display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.04);border:1px solid var(--hair);color:#DDE2FF;border-radius:9px;padding:.4rem .75rem;font-weight:600;font-size:.84rem;cursor:pointer}
+.turnpick button:hover,.swap button:hover{background:rgba(255,255,255,.09)}
+.turnpick button.sel{background:var(--gold-grad);color:#2A1C00;border-color:transparent}
+.ctrl .hint{margin-right:.4rem}
+.swap{display:flex;flex-wrap:wrap;gap:.35rem;align-items:center;margin-top:.8rem;padding-top:.7rem;border-top:1px solid var(--hair);font-size:.78rem;color:var(--dim)}
+.swap button{padding:.28rem .55rem;font-size:.78rem}
+.pod.turn{box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 2px var(--g2),0 0 30px rgba(255,200,60,.25),0 14px 30px rgba(0,0,0,.35)}
+.pod .nm em.up{font:800 .7rem/1 var(--f);font-style:normal;letter-spacing:.06em;background:var(--gold-grad);color:#2A1C00;padding:.22rem .45rem;border-radius:5px;margin-right:.1rem;align-self:center}
+.rule.sel{flex-direction:column;gap:.5rem;cursor:default}
+.rule.sel select{width:100%;text-align:left}
 
 </style>
 </head>
@@ -2797,7 +2810,7 @@ const app = {
   session: LS.get("jp.session", null), setupGameId: null,
   rules: (() => {
     const T = { tBuzz: 15, tAns: 15, tSteal: 10, tStealAns: 5, tDD: 15, tFinal: 25 };
-    const r = Object.assign({ penalty: false, ddPenalty: true, steal: true, timers: true }, T, LS.get("jp.rules", {}));
+    const r = Object.assign({ penalty: false, ddPenalty: true, steal: true, timers: true, turnMode: "next" }, T, LS.get("jp.rules", {}));
     if (r.tVer !== 2) { Object.assign(r, T, { tVer: 2 }); LS.set("jp.rules", r); }
     return r;
   })(),
@@ -2997,12 +3010,13 @@ function renderSetup() {
         <div class="rules"><h2>Scoring</h2>
           <label class="rule"><input type="checkbox" data-bind="rule.penalty" ${app.rules.penalty ? "checked" : ""}><span><b>Wrong answers lose points</b><small>Off: a miss costs nothing on regular clues. On: a miss takes the clue's value off.</small></span></label>
           <label class="rule"><input type="checkbox" data-bind="rule.ddPenalty" ${app.rules.ddPenalty ? "checked" : ""}><span><b>Daily Double misses lose the wager</b><small>Teams see this warning before they wager.</small></span></label>
-          <label class="rule"><input type="checkbox" data-bind="rule.steal" ${app.rules.steal ? "checked" : ""}><span><b>Open steals automatically</b><small>After a wrong answer, teams that haven't answered get a Steal button.</small></span></label>
+          <label class="rule"><input type="checkbox" data-bind="rule.steal" ${app.rules.steal ? "checked" : ""}><span><b>Open buzzers after a miss</b><small>When the team whose turn it is answers wrong, the other teams can buzz in. Each miss reopens buzzers for the teams that haven't answered.</small></span></label>
+          <p class="note" style="margin-top:.4rem">The turn stays with a team until you move it with the Whose turn bar under the board.</p>
         </div>
         <div class="rules"><h2>Timers</h2>
           <label class="rule"><input type="checkbox" data-bind="rule.timers" ${app.rules.timers ? "checked" : ""}><span><b>Use countdown timers</b><small>Shown on the board and on every phone. When time runs out, buzzing closes on its own; for answers you still make the call.</small></span></label>
           <div class="tgrid ${app.rules.timers ? "" : "off"}" id="timerGrid">
-            ${[["tBuzz","Time to buzz in"],["tAns","Time to answer"],["tSteal","Time to steal"],["tStealAns","Time to answer a steal"],["tDD","Daily Double answer"],["tFinal","Final Jeopardy"]].map(([k, l]) => `<label><span>${l}</span><span class="sec"><input type="number" min="1" max="120" data-bind="rule.${k}" value="${app.rules[k]}">sec</span></label>`).join("")}
+            ${[["tAns","Answer on your turn"],["tSteal","Buzz in after a miss"],["tStealAns","Answer after buzzing in"],["tBuzz","Buzz in when it's nobody's turn"],["tDD","Daily Double answer"],["tFinal","Final Jeopardy"]].map(([k, l]) => `<label><span>${l}</span><span class="sec"><input type="number" min="1" max="120" data-bind="rule.${k}" value="${app.rules[k]}">sec</span></label>`).join("")}
           </div>
         </div>
       </div>
@@ -3055,7 +3069,7 @@ function updatePlayersUI() {
 function startSession() {
   const g = app.games[app.setupGameId];
   app.session = {
-    gameId: g.id, title: g.title, penalty: !!app.rules.penalty, ddPenalty: !!app.rules.ddPenalty, autoSteal: app.rules.steal !== false, tm: timerRules(), clock: null, rounds: clone(g.rounds.slice(0, g.useDouble ? 2 : 1)),
+    gameId: g.id, title: g.title, penalty: !!app.rules.penalty, ddPenalty: !!app.rules.ddPenalty, autoSteal: app.rules.steal !== false, turnMode: "stay", turn: app.teams[0] ? app.teams[0].id : null, tm: timerRules(), clock: null, rounds: clone(g.rounds.slice(0, g.useDouble ? 2 : 1)),
     final: g.useFinal && g.final.q.trim() ? clone(g.final) : null,
     teams: app.teams.map(t => ({ ...t, score: 0 })),
     round: 0, used: {}, phase: "board", cur: null, show: false, dd: null, res: {},
@@ -3091,9 +3105,9 @@ function renderScores() {
   w.innerHTML = ctrlHTML() + `<div class="scores" style="--n:${s.teams.length}">${s.teams.map(t => {
     const n = ps.filter(p => p.team === t.id).length, bump = prev[t.id] !== undefined && prev[t.id] !== t.score;
     app.prevScores[t.id] = t.score;
-    return `<div class="pod ${t.score === top && t.score > 0 ? "lead" : ""} ${bump ? "bump" : ""}" style="--c:${t.color}">
+    return `<div class="pod ${t.score === top && t.score > 0 ? "lead" : ""} ${bump ? "bump" : ""} ${s.turn === t.id && (s.phase === "board" || s.phase === "clue") ? "turn" : ""}" style="--c:${t.color}">
       <div class="adj"><button data-act="adj" data-t="${t.id}" data-d="-100" aria-label="${esc(t.name)} minus 100">−</button><button data-act="adj" data-t="${t.id}" data-d="100" aria-label="${esc(t.name)} plus 100">+</button></div>
-      <div class="nm">${esc(t.name)}${n ? `<small>${n}</small>` : ""}</div>
+      <div class="nm">${s.turn === t.id && (s.phase === "board" || s.phase === "clue") ? `<em class="up">Turn</em>` : ""}${esc(t.name)}${n ? `<small>${n}</small>` : ""}</div>
       <div class="screen"><div class="pts ${t.score < 0 ? "neg" : ""}">${money(t.score)}</div></div></div>`;
   }).join("")}</div>`;
   const c = $("#conn"); if (c) c.outerHTML = connHTML();
@@ -3216,24 +3230,29 @@ function queueHTML() {
   else if (b.winner) {
     const t = teamById(b.winner.team);
     h += `<div class="answering" style="--c:${t ? t.color : "#888"}">
-      <div class="lab">${b.winner.kind === "steal" ? "Stealing" : "Buzzed in first"}</div>
+      <div class="lab">${b.winner.kind === "turn" ? "Their turn" : b.winner.kind === "steal" ? "Buzzed in after a miss" : "Buzzed in first"}</div>
       <div class="tn">${esc(t ? t.name : "")}</div><div class="pn">${esc(b.winner.name)}</div>
-      <div class="row" style="margin-top:.8rem"><button class="btn ok" data-act="judge" data-t="${b.winner.team}" data-v="right">✓ Correct</button><button class="btn no" data-act="judge" data-t="${b.winner.team}" data-v="wrong">✗ Wrong</button></div></div>`;
+      <div class="row" style="margin-top:.8rem"><button class="btn ok" data-act="judge" data-t="${b.winner.team}" data-v="right">✓ Correct</button><button class="btn no" data-act="judge" data-t="${b.winner.team}" data-v="wrong">✗ Wrong</button></div>
+      ${turnChangeable() ? `<div class="swap"><span>Not their turn?</span>${s.teams.filter(x => x.id !== b.winner.team).map(x => `<button data-act="setTurn" data-t="${x.id}"><span class="dot" style="background:${x.color}"></span>${esc(x.name)}</button>`).join("")}</div>` : ""}</div>`;
   } else if (b.open) {
-    h += `<p class="bstat open"><span class="dot"></span>${b.kind === "steal" ? "Steal is open" : "Buzzers open"}</p>
+    h += `<p class="bstat open"><span class="dot"></span>Buzzers open</p>
       <div class="elig">${elig.map(t => `<span class="chip"><span class="dot" style="background:${t.color}"></span>${esc(t.name)}</span>`).join("")}</div>
-      <p class="hint" style="margin-top:.8rem">First ${b.kind === "steal" ? "steal" : "buzz"} wins. Everyone else locks.</p>`;
+      <p class="hint" style="margin-top:.8rem">First buzz wins. Everyone else locks.</p>`;
   } else if (b.timedOut === "buzz") h += `<p class="bstat"><span class="dot" style="background:var(--bad)"></span>Time's up. No one buzzed in.</p><p class="hint">Reveal the answer, or press B to reopen buzzers.</p>`;
-  else if (b.timedOut === "steal") h += `<p class="bstat"><span class="dot" style="background:var(--bad)"></span>Time's up. No one stole it.</p><p class="hint">Reveal the answer and head back to the board.</p>`;
+  else if (b.timedOut === "steal") h += `<p class="bstat"><span class="dot" style="background:var(--bad)"></span>Time's up. No one buzzed in.</p><p class="hint">Reveal the answer and head back to the board.</p>`;
   else if (b.answered.length && !elig.length) h += `<p class="hint">Every team has missed. Reveal the answer and head back to the board, or send it to a mini game.</p>`;
-  else if (b.answered.length) h += `<p class="hint">Steal is closed. Press B to open it for ${elig.map(t => esc(t.name)).join(", ")}.</p>`;
-  else h += `<p class="hint">Read the clue, then press B to open buzzers.</p>`;
+  else if (b.answered.length) h += `<p class="hint">Buzzers are closed. Press B to open them for ${elig.map(t => esc(t.name)).join(", ")}.</p>`;
+  else h += `<p class="hint">It's nobody's turn. Read the clue, then press B to open buzzers for everyone.</p>`;
   h += suckBtn();
   if (b.log.length) h += `<ol class="log">${b.log.map(l => { const t = teamById(l.team); return `<li class="${l.v}"><span class="dot" style="background:${t ? t.color : "#888"}"></span><span>${esc(t ? t.name : "")}${l.name ? `<small>${esc(l.name)}</small>` : ""}</span><b>${l.v === "right" ? "Correct" : "Wrong"}</b></li>`; }).join("")}</ol>`;
   return h;
 }
 function ctrlHTML() {
   const s = app.session;
+  if (s.phase === "board" && !roundDone(s.round)) return `<div class="ctrl"><div class="judge turnpick"><span class="tlab">Whose turn</span>
+      ${s.teams.map(t => `<button class="${s.turn === t.id ? "sel" : ""}" data-act="setTurn" data-t="${t.id}"><span class="dot" style="background:${t.color}"></span>${esc(t.name)}</button>`).join("")}
+      <button class="${!s.turn ? "sel" : ""}" data-act="setTurn" data-t="">Nobody (buzz for it)</button></div>
+      <span class="hint">${s.turn ? esc((teamById(s.turn) || {}).name || "") + " picks and answers first." : "Everyone buzzes for the next clue."}</span></div>`;
   if (s.phase === "clue") {
     const res = s.res[`${s.cur.r}-${s.cur.c}-${s.cur.i}`] || {};
     const teams = s.dd ? [teamById(s.dd.team)] : s.teams;
@@ -3241,7 +3260,7 @@ function ctrlHTML() {
         <button class="btn yes ${res[t.id] === "right" ? "sel" : ""}" data-act="judge" data-t="${t.id}" data-v="right" aria-label="${esc(t.name)} correct">✓</button>
         <button class="btn no ${res[t.id] === "wrong" ? "sel" : ""}" data-act="judge" data-t="${t.id}" data-v="wrong" aria-label="${esc(t.name)} wrong">✗</button></div>`).join("")}</div>
       <div class="row">
-        ${!s.dd && net.mode ? `<button class="btn ${s.buzz.open ? "on" : ""}" data-act="buzzToggle" ${!s.buzz.open && (s.buzz.solved || s.buzz.winner || !eligibleTeams().length) ? "disabled" : ""}>${s.buzz.open ? (s.buzz.kind === "steal" ? "Close steal" : "Close buzzers") : s.buzz.answered.length ? "Open steal" : "Open buzzers"} <kbd>B</kbd></button>` : ""}
+        ${!s.dd && net.mode ? `<button class="btn ${s.buzz.open ? "on" : ""}" data-act="buzzToggle" ${!s.buzz.open && (s.buzz.solved || s.buzz.winner || !eligibleTeams().length) ? "disabled" : ""}>${s.buzz.open ? "Close buzzers" : "Open buzzers"} <kbd>B</kbd></button>` : ""}
         <button class="btn" data-act="reveal">${s.show ? "Hide answer" : "Reveal answer"} <kbd>Space</kbd></button>
         <button class="btn gold" data-act="back">Back to board <kbd>Esc</kbd></button></div></div>`;
   }
@@ -3272,9 +3291,17 @@ function openBuzz(kind) {
   startClock(kind === "steal" ? "steal" : "buzz");
 }
 function refreshClueUI() { renderQueue(); renderScores(); }
+function giveTurn(team) {
+  // the team whose turn it is answers first; their whole team stays greyed out
+  const s = app.session, b = s.buzz;
+  b.winner = team ? { peer: null, name: "", team, kind: "turn" } : null;
+  b.open = false; b.token = null;
+  if (team) startClock("answer"); else s.clock = null;
+}
+function turnChangeable() { const s = app.session, b = s.buzz; return s.phase === "clue" && !s.dd && !b.log.length && !b.open && (!b.winner || b.winner.kind === "turn"); }
 function canSuck() {
   const s = app.session; if (!s || s.phase !== "clue" || s.dd) return false;
-  const b = s.buzz; return !b.solved && !b.winner;
+  const b = s.buzz; return !b.solved;
 }
 function allMissed() { const s = app.session, b = s.buzz; return (b.answered.length > 0 && !eligibleTeams().length) || !!b.timedOut; }
 const suckBtn = () => canSuck() ? `<button class="suckbtn ${allMissed() ? "" : "quiet"}" data-act="suck">You all suck</button>` : "";
@@ -3286,7 +3313,7 @@ function timerRules() {
 const CLOCK_SECS = { buzz: "buzz", answer: "ans", steal: "steal", stealAnswer: "stealAns", dd: "dd" };
 let lastTick = -1;
 function startClock(kind) {
-  const s = app.session; if (!s.tm) s.tm = timerRules();
+  const s = app.session; if (!s.tm) s.tm = timerRules(); if (s.turn === undefined) { s.turn = s.teams[0] ? s.teams[0].id : null; s.turnMode = "stay"; }
   if (!s.tm.on) { s.clock = null; return; }
   const secs = s.tm[CLOCK_SECS[kind]] || 5;
   s.clock = { kind, ends: Date.now() + secs * 1000, total: secs * 1000, up: false };
@@ -3298,8 +3325,8 @@ function clockHTML() {
   if (!c) return "";
   const left = Math.max(0, c.ends - Date.now()), frac = c.up ? 0 : left / c.total, n = 9, on = Math.ceil(frac * n), mid = (n - 1) / 2;
   const wt = s.buzz.winner ? teamById(s.buzz.winner.team) : s.dd ? teamById(s.dd.team) : null;
-  const col = c.kind === "steal" || c.kind === "stealAnswer" ? "#FF9A2E" : (c.kind === "answer" || c.kind === "dd") && wt ? wt.color : "#FFD553";
-  const label = { buzz: "Buzz in", answer: "Answer", steal: "Steal", stealAnswer: "Answer", dd: "Answer" }[c.kind];
+  const col = (c.kind === "answer" || c.kind === "stealAnswer" || c.kind === "dd") && wt ? wt.color : "#FFD553";
+  const label = { buzz: "Buzz in", answer: "Answer", steal: "Buzz in", stealAnswer: "Answer", dd: "Answer" }[c.kind];
   return `<div class="clock ${c.up ? "up" : ""}" style="--cc:${col}" data-act="stopClock" title="Click to stop the timer">
     <span class="clab">${c.up ? "Time's up" : label}</span>
     <span class="lights">${Array.from({length: n}, (_, k) => `<i class="${Math.abs(k - mid) < on / 2 + .01 ? "on" : ""}"></i>`).join("")}</span>
@@ -3352,12 +3379,17 @@ function openClue(ci, i) {
   const s = app.session, cl = s.rounds[s.round].cats[ci].clues[i];
   s.cur = { r: s.round, c: ci, i }; s.show = false;
   s.buzz = freshBuzz(); s.clock = null;
-  if (cl.dd) { s.dd = { team: null, wager: 0 }; s.phase = "dd"; [523, 659, 784, 1047].forEach((f, k) => setTimeout(() => beep(f, .22), k * 110)); } else { s.dd = null; s.phase = "clue"; }
+  if (cl.dd) { s.dd = { team: s.turn || null, wager: 0 }; s.phase = "dd"; [523, 659, 784, 1047].forEach((f, k) => setTimeout(() => beep(f, .22), k * 110)); }
+  else { s.dd = null; s.phase = "clue"; if (s.turn && s.teams.some(t => t.id === s.turn)) giveTurn(s.turn); }
   saveSession(); refreshMain(); broadcast();
 }
 function backToBoard() {
   const s = app.session; if (!s.cur) return;
-  s.used[`${s.cur.r}-${s.cur.c}-${s.cur.i}`] = true;
+  const key = `${s.cur.r}-${s.cur.c}-${s.cur.i}`;
+  s.used[key] = true;
+  const mode = "stay", res = s.res[key] || {};
+  if (mode === "next" && s.turn) { const i = s.teams.findIndex(t => t.id === s.turn); s.turn = s.teams[(i + 1) % s.teams.length].id; }
+  else if (mode === "correct") { const w = Object.keys(res).find(t => res[t] === "right"); if (w) s.turn = w; }
   s.phase = "board"; s.cur = null; s.dd = null; s.show = false;
   s.buzz = freshBuzz(); s.clock = null;
   saveSession(); refreshMain(); broadcast();
@@ -3423,7 +3455,7 @@ function publicState() {
   const k = s && s.phase === "suck" && s.suck ? s.suck : null;
   return { v: 2, title: s ? s.title : "", live: !!s, open: b.open, kind: b.kind, token: b.open ? b.token : null,
     winner: b.winner ? { peer: b.winner.peer, name: b.winner.name, team: b.winner.team, kind: b.winner.kind } : null,
-    answered: b.answered, solved: b.solved, teams,
+    answered: b.answered, solved: b.solved, teams, turn: s ? s.turn || null : null, onBoard: !!s && s.phase === "board",
     suck: k ? { stage: k.stage, value: k.value, out: k.out, token: k.stage === "ready" ? k.readyToken : k.stage === "go" ? k.token : null, winner: k.winner, reason: k.reason || "" } : null,
     clock: s && s.clock && s.phase === "clue" ? { kind: s.clock.kind, left: Math.max(0, s.clock.ends - Date.now()), total: s.clock.total, up: !!s.clock.up } : null };
 }
@@ -3519,11 +3551,12 @@ function playerSend(msg) {
 }
 function onHostState(d) {
   if (!d || typeof d !== "object" || !Array.isArray(d.teams)) return;
-  const w = d.winner && typeof d.winner === "object" ? { peer: String(d.winner.peer), name: cleanName(d.winner.name), team: String(d.winner.team), kind: d.winner.kind === "steal" ? "steal" : "buzz" } : null;
+  const w = d.winner && typeof d.winner === "object" ? { peer: String(d.winner.peer), name: cleanName(d.winner.name), team: String(d.winner.team), kind: ["steal", "turn"].includes(d.winner.kind) ? d.winner.kind : "buzz" } : null;
   app.hostState = { title: String(d.title || ""), live: !!d.live, open: !!d.open, kind: d.kind === "steal" ? "steal" : "buzz", token: d.token ? String(d.token) : null,
     suck: d.suck && typeof d.suck === "object" ? { stage: String(d.suck.stage), value: +d.suck.value || 0, out: Array.isArray(d.suck.out) ? d.suck.out.map(String) : [], token: d.suck.token ? String(d.suck.token) : null,
       winner: d.suck.winner && typeof d.suck.winner === "object" ? { team: String(d.suck.winner.team), name: cleanName(d.suck.winner.name) } : null, reason: cleanName(d.suck.reason) } : null,
     clock: d.clock && typeof d.clock === "object" && +d.clock.total > 0 ? { kind: String(d.clock.kind), ends: Date.now() + Math.max(0, +d.clock.left || 0), total: Math.min(+d.clock.total, 180000), up: !!d.clock.up } : null,
+    turn: d.turn ? String(d.turn) : null, onBoard: !!d.onBoard,
     winner: w, solved: !!d.solved, answered: Array.isArray(d.answered) ? d.answered.map(String) : [],
     teams: d.teams.slice(0, 8).map(t => ({ id: String(t.id), name: cleanName(t.name), color: /^#[0-9A-Fa-f]{6}$/.test(t.color) ? t.color : "#777", score: +t.score || 0 })) };
   net.pstatus = "ok";
@@ -3610,18 +3643,24 @@ function renderPlayer() {
   } else if (waitMsg && net.pstatus !== "ok") msg = waitMsg;
   else if (!st) msg = "Connecting to the host…";
   else if (!st.live) msg = "You're in. Waiting for the game to start.";
-  else if (st.winner && st.winner.team === me.team) {
-    cls = "hit"; label = st.winner.kind === "steal" ? "Steal!" : "#1";
-    msg = st.winner.peer === id ? (st.winner.kind === "steal" ? "You stole it! Answer now." : "You're first! Answer now.") : `${st.winner.name} is answering for your team`;
+  else if (st.winner && st.winner.kind === "turn" && st.winner.team === me.team) { msg = "Your team's turn. Answer now!"; cls = "out"; label = "Turn"; sub = "Your buzzer stays off for this clue."; }
+  else if (st.winner && st.winner.kind === "turn") {
+    const wt = teams.find(t => t.id === st.winner.team);
+    msg = `${wt ? wt.name : "Another team"}'s turn`; sub = "If they miss, buzzers open for you.";
+  } else if (st.winner && st.winner.team === me.team) {
+    cls = "hit"; label = "#1";
+    msg = st.winner.peer === id ? "You're in! Answer now." : `${st.winner.name} is answering for your team`;
   } else if (st.winner) {
     const wt = teams.find(t => t.id === st.winner.team);
-    msg = `${wt ? wt.name : "Another team"} ${st.winner.kind === "steal" ? "is stealing" : "buzzed in first"}`;
-    if (!answered && !st.solved) sub = st.winner.kind === "steal" ? "If they miss, you may get to steal." : "If they miss, you can steal.";
+    msg = `${wt ? wt.name : "Another team"} buzzed in`;
+    if (!answered && !st.solved) sub = "If they miss, buzzers reopen.";
+  } else if (st.onBoard) {
+    const tt = teams.find(t => t.id === st.turn);
+    msg = tt ? (tt.id === me.team ? "Your team's turn. Pick a clue!" : `${tt.name} is picking`) : "Next clue is open to everyone";
   } else if (st.solved) msg = "Answered correctly";
   else if (answered) { msg = "Your team already answered this one"; cls = "out"; label = "Out"; }
   else if (pressed) { msg = "Sent! Waiting…"; cls = "hit"; label = "…"; }
-  else if (st.open && st.kind === "buzz") { msg = "Buzzers are open"; cls = "live"; buzzLive = true; }
-  else if (st.open && st.kind === "steal") { msg = "Steal is open. Tap Steal!"; stealLive = true; }
+  else if (st.open) { msg = "Buzzers are open"; cls = "live"; buzzLive = true; }
   else msg = "Wait for the host to open buzzers";
   app.pLive = { buzz: buzzLive, steal: stealLive, qd: qdLive };
   $("#app").innerHTML = `<div class="player">${top}
@@ -3630,7 +3669,6 @@ function renderPlayer() {
       ${big ? `<div class="psuck mgp">${esc(big)}</div>` : ""}
       <p class="pmsg" aria-live="polite">${esc(msg)}</p>
       <div class="ring ${cls}"><button class="buzzer ${cls}" id="buzzer" ${buzzLive || qdLive ? "" : "disabled"} aria-label="Buzz in">${label}</button></div>
-      ${k ? "" : `<button class="steal ${stealLive ? "live" : ""}" id="steal" ${stealLive ? "" : "disabled"} aria-label="Steal">Steal</button>`}
       <p class="psub">${esc(sub)}</p>
       <div id="pclock" class="pclock">${pClockHTML()}</div>
       ${st && st.live ? `<div class="pscores">${[...teams].sort((a, b) => b.score - a.score).map(t => `<div class="${t.id === me.team ? "mine" : ""}" style="--c:${t.color}"><span><span class="dot" style="background:${t.color}"></span>${esc(t.name)}</span><b>${money(t.score)}</b></div>`).join("")}</div>` : ""}
@@ -3654,7 +3692,7 @@ function doBuzz(kind) {
     renderPlayer(); return;
   }
   if (!st || !st.open || !st.token || st.kind !== kind || st.winner || app.buzzed === st.token || st.answered.includes(app.me.team)) return;
-  if (!app.pLive || !app.pLive[kind]) return;
+  if (!app.pLive || !app.pLive.buzz) return;
   app.buzzed = st.token;
   playerSend({ t: "buzz", token: st.token });
   if (navigator.vibrate) navigator.vibrate(60);
@@ -3730,9 +3768,14 @@ const actions = {
     if (!(w >= 5 && w <= max)) { toast(`Enter a wager between $5 and ${money(max)}.`); return; }
     s.dd.wager = w; s.phase = "clue"; startClock("dd"); saveSession(); refreshMain(); broadcast();
   },
+  setTurn(d) {
+    const s = app.session, t = d.t || null;
+    if (s.phase === "board") { s.turn = t; saveSession(); renderScores(); broadcast(); return; }
+    if (turnChangeable()) { s.turn = t; giveTurn(t); saveSession(); refreshMain(); broadcast(); }
+  },
   suck() {
     const s = app.session; if (!canSuck()) return;
-    stopClock(); s.show = false; s.buzz.open = false; s.buzz.token = null;
+    stopClock(); s.show = false; s.buzz.open = false; s.buzz.token = null; s.buzz.winner = null;
     s.suck = { stage: "intro", value: curClue().value, out: [], winner: null, token: null, readyToken: null, goAt: 0, reason: "" };
     s.phase = "suck"; sadTrombone(); saveSession(); refreshMain(); broadcast();
   },
@@ -3801,7 +3844,7 @@ document.addEventListener("click", e => {
   if (app.view === "play" && app.role === "host" && document.activeElement && document.activeElement.blur) document.activeElement.blur();
 });
 document.addEventListener("pointerdown", e => {
-  if (e.target.closest("#buzzer")) { e.preventDefault(); doBuzz(app.pLive && app.pLive.qd ? "qd" : "buzz"); }
+  if (e.target.closest("#buzzer")) { e.preventDefault(); doBuzz(app.pLive && app.pLive.qd ? "qd" : (app.hostState && app.hostState.kind) || "buzz"); }
   else if (e.target.closest("#steal")) { e.preventDefault(); doBuzz("steal"); }
 });
 document.addEventListener("input", e => {
@@ -3828,6 +3871,7 @@ document.addEventListener("input", e => {
   scheduleSave(g);
 });
 document.addEventListener("change", e => {
+  if (e.target.dataset.actChange === "turnMode") { app.rules.turnMode = e.target.value; LS.set("jp.rules", app.rules); return; }
   if (e.target.dataset.actChange === "values") {
     const g = app.games[app.editId], base = +e.target.value;
     g.rounds[app.tab].cats.forEach(c => c.clues.forEach((cl, i) => cl.value = base * (i + 1)));
@@ -3837,7 +3881,7 @@ document.addEventListener("change", e => {
 document.addEventListener("keydown", e => {
   if (app.role === "player") {
     if (e.key === "Enter" && $("#pcode") && document.activeElement === $("#pcode")) actions.enterCode();
-    else if (e.code === "Space" && app.pLive && (app.pLive.buzz || app.pLive.steal || app.pLive.qd)) { e.preventDefault(); doBuzz(app.pLive.qd ? "qd" : app.pLive.buzz ? "buzz" : "steal"); }
+    else if (e.code === "Space" && app.pLive && (app.pLive.buzz || app.pLive.steal || app.pLive.qd)) { e.preventDefault(); doBuzz(app.pLive.qd ? "qd" : (app.hostState && app.hostState.kind) || "buzz"); }
     return;
   }
   if (e.key === "Escape" && app.modal) { actions.closeModal(); return; }
