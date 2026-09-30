@@ -429,6 +429,14 @@ kbd{font:600 .68rem var(--f);color:var(--dim);border:1px solid var(--hair);borde
 .pod .nm em.up{font:800 .7rem/1 var(--f);font-style:normal;letter-spacing:.06em;background:var(--gold-grad);color:#2A1C00;padding:.22rem .45rem;border-radius:5px;margin-right:.1rem;align-self:center}
 .rule.sel{flex-direction:column;gap:.5rem;cursor:default}
 .rule.sel select{width:100%;text-align:left}
+/* buzzer server box */
+.srv{margin-top:1.2rem;padding:.9rem 1rem;border-radius:12px;background:rgba(255,213,83,.07);border:1px solid rgba(255,213,83,.28);display:flex;flex-direction:column;gap:.25rem}
+.srv small{color:var(--dim);font-size:.82rem;line-height:1.4}
+.srv input{flex:1;min-width:200px;border:1px solid var(--hair);background:rgba(255,255,255,.06);color:var(--text);border-radius:9px;padding:.55rem .7rem;font-size:.85rem}
+.srv.ok{flex-direction:row;justify-content:space-between;align-items:center;background:rgba(255,255,255,.04);border-color:var(--hair);font-size:.82rem;color:var(--dim)}
+.srv.ok b{color:var(--text);font-weight:600}
+.status.bad .dot{background:var(--bad)}
+#joinBtn:disabled{opacity:.45;filter:grayscale(.4)}
 
 </style>
 </head>
@@ -2766,7 +2774,41 @@ const PREFIX = "jpyhost-v1-";
 const CODE_CHARS = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
 const newCode = () => Array.from({length: 5}, () => CODE_CHARS[Math.floor(Math.random() * CODE_CHARS.length)]).join("");
 const baseUrl = () => location.href.split("#")[0].split("?")[0];
-const joinUrl = code => baseUrl() + "#join=" + code;
+// Buzzer server: a Firebase Realtime Database relays buzzes over a normal web connection,
+// which works on any Wi-Fi or cellular network (unlike direct phone-to-laptop links).
+const DEFAULT_SERVER = "https://jeopardy-buzzers-default-rtdb.firebaseio.com";
+function normServer(u) {
+  u = String(u || "").trim(); if (!u) return "";
+  if (!/^https?:\/\//i.test(u)) u = "https://" + u;
+  try { const x = new URL(u); return /(\.firebaseio\.com|\.firebasedatabase\.app)$/i.test(x.hostname) ? "https://" + x.hostname.toLowerCase() : ""; } catch { return ""; }
+}
+const serverHost = u => u ? u.replace(/^https:\/\//, "") : "";
+const joinUrl = code => baseUrl() + "#join=" + code + (net.mode === "fb" && net.server ? "&s=" + serverHost(net.server) : "");
+const fb = {
+  u: (base, path) => `${base}/${path}.json`,
+  send(base, path, method, data) {
+    return fetch(fb.u(base, path), { method, body: data === undefined ? undefined : JSON.stringify(data) })
+      .then(r => { if (!r.ok) throw Object.assign(new Error("http " + r.status), { status: r.status }); return r; });
+  },
+  listen(base, path, onEvent, onStatus) {
+    let es = null, closed = false, retry = null;
+    const open = () => {
+      if (closed) return;
+      es = new EventSource(fb.u(base, path));
+      const handle = type => e => { onStatus("ok"); try { const m = JSON.parse(e.data); if (m) onEvent(type, m.path, m.data); } catch {} };
+      es.addEventListener("put", handle("put"));
+      es.addEventListener("patch", handle("patch"));
+      es.addEventListener("keep-alive", () => onStatus("ok"));
+      es.addEventListener("cancel", () => { onStatus("denied"); });
+      es.onerror = () => {
+        onStatus("lost");
+        if (es.readyState === 2) { es.close(); clearTimeout(retry); retry = setTimeout(open, 2500); }
+      };
+    };
+    open();
+    return { close() { closed = true; clearTimeout(retry); if (es) es.close(); }, reopen() { if (es) es.close(); open(); } };
+  }
+};
 function qrSVG(text) {
   if (typeof qrcode !== "function") return "";
   const q = qrcode(0, "M"); q.addData(text); q.make();
@@ -2807,7 +2849,7 @@ function summary(g) {
 // ---------- app state ----------
 const app = {
   role: null, view: "library", games: LS.get("jp.games", {}), editId: null, tab: 0, modal: null,
-  session: LS.get("jp.session", null), setupGameId: null,
+  session: LS.get("jp.session", null), setupGameId: null, server: "", editServer: false,
   rules: (() => {
     const T = { tBuzz: 15, tAns: 15, tSteal: 10, tStealAns: 5, tDD: 15, tFinal: 25 };
     const r = Object.assign({ penalty: false, ddPenalty: true, steal: true, timers: true, turnMode: "next" }, T, LS.get("jp.rules", {}));
@@ -3028,7 +3070,7 @@ function renderSetup() {
   </div>`;
 }
 function statusHTML() {
-  const map = { online: ["on", "Room open"], connecting: ["wait", "Opening room…"], reconnecting: ["wait", "Reconnecting…"], offline: ["", "Offline. Check your internet."], off: ["", "Buzzers off"] };
+  const map = { online: ["on", "Room open"], connecting: ["wait", "Opening room…"], reconnecting: ["wait", "Reconnecting…"], offline: ["", "Offline. Check your internet."], denied: ["bad", "Server blocked"], off: ["", "Buzzers off"] };
   const [cls, label] = map[net.status] || map.off;
   return `<span class="status ${cls}"><span class="dot"></span>${label}</span>`;
 }
@@ -3036,7 +3078,7 @@ function joinPanelHTML() {
   const chips = playersHTML();
   if (net.mode === "room") return `<div class="row" style="justify-content:space-between;margin-bottom:1rem"><h2 style="margin:0">Buzzers</h2>${statusHTML()}</div>
     <p class="muted" style="color:var(--dim);margin:0">Share this artifact and send players the link. They need to be signed in to Claude here; the standalone copy works without accounts.</p><div id="players">${chips}</div>`;
-  if (net.mode !== "p2p") return `<h2>Buzzers</h2><p style="color:var(--dim)">Buzzers aren't available here. You can still score every team by hand.</p>`;
+  if (net.mode !== "p2p" && net.mode !== "fb") return `<h2>Buzzers</h2><p style="color:var(--dim)">Buzzers aren't available here. You can still score every team by hand.</p>`;
   const url = net.code ? joinUrl(net.code) : "";
   return `<div class="row" style="justify-content:space-between;margin-bottom:1rem"><h2 style="margin:0">Players join here</h2>${statusHTML()}</div>
     <div class="joinbox">
@@ -3045,8 +3087,18 @@ function joinPanelHTML() {
         <div class="joinurl">${esc(url)}</div>
         <div class="row"><button class="btn" data-act="copyLink" ${net.code ? "" : "disabled"}>Copy link</button><button class="btn" data-act="newCode">New code</button></div></div>
     </div>
+    ${net.status === "denied" ? `<p class="note" style="color:#FF8A8A">Your buzzer server refused the connection. In Firebase, open Realtime Database, then Rules, and paste the rules from the setup steps.</p>` : ""}
     ${location.protocol === "file:" ? `<p class="note" style="color:var(--g2)">This page is open from a file on your computer, so phones can't use this link. Upload it to a website first, then host from there.</p>` : ""}
+    ${serverBoxHTML()}
     <div id="players">${chips}</div>`;
+}
+function serverBoxHTML() {
+  if (IN_CLAUDE) return "";
+  if (net.mode === "fb" && !app.editServer) return `<div class="srv ok"><span>Buzzer server: <b>${esc(serverHost(net.server))}</b></span><button class="linkbtn" data-act="editServer">Change</button></div>`;
+  return `<div class="srv">
+    <b>${net.mode === "fb" ? "Change buzzer server" : "Set up the buzzer server (one time)"}</b>
+    <small>${net.mode === "fb" ? "" : "Without it, phones try to connect straight to this laptop, which many Wi-Fi and cellular networks block. "}Paste your Firebase Realtime Database URL.</small>
+    <div class="row" style="margin-top:.5rem"><input id="srvIn" placeholder="https://your-project-default-rtdb.firebaseio.com" value="${esc(app.editServer ? app.server : "")}"><button class="btn" data-act="saveServer">Save</button>${net.mode === "fb" ? `<button class="btn ghost" data-act="cancelServer">Cancel</button>` : ""}</div></div>`;
 }
 function updateLobby() {
   const p = $("#joinPanel"); if (p) p.innerHTML = joinPanelHTML();
@@ -3464,6 +3516,16 @@ function sendNow() {
   const st = publicState();
   if (net.mode === "room" && net.room) net.room.emit("state", st).catch(() => {});
   if (net.mode === "p2p") for (const c of net.conns.values()) { try { if (c.open) c.send({ t: "state", ...st }); } catch {} }
+  if (net.mode === "fb") fbWriteState();
+}
+let fbBusy = false, fbAgain = false;
+function fbWriteState() {
+  if (fbBusy) { fbAgain = true; return; }
+  fbBusy = true; fbAgain = false;
+  fb.send(net.server, `rooms/${net.code}/state`, "PUT", Object.assign(publicState(), { at: { ".sv": "timestamp" } }))
+    .then(() => { if (net.status !== "online") { net.status = "online"; updateLobby(); } })
+    .catch(e => { net.status = e && (e.status === 401 || e.status === 403) ? "denied" : "reconnecting"; updateLobby(); })
+    .finally(() => { fbBusy = false; if (fbAgain) fbWriteState(); });
 }
 function broadcast() { if (app.role !== "host" || !net.mode) return; clearTimeout(bTimer); bTimer = setTimeout(sendNow, 40); }
 function considerBuzz(id) {
@@ -3493,6 +3555,48 @@ function hostRoom(room) {
   room.presence({ role: "host" }).catch(() => {});
   setInterval(() => { if (net.mode === "room") sendNow(); }, 3000);
 }
+function hostFB() {
+  if (net.fbListen) net.fbListen.close();
+  if (net.peer) { try { net.peer.destroy(); } catch {} net.peer = null; }
+  net.mode = "fb"; net.server = app.server; net.status = "connecting";
+  net.code = net.code || LS.get("jp.code", null) || newCode(); LS.set("jp.code", net.code);
+  net.players.clear(); net.raw = new Map(); net.seen = new Map();
+  const applyOne = (pid, obj) => {
+    if (!obj || typeof obj !== "object") { net.raw.delete(pid); net.players.delete(pid); return; }
+    const prev = net.players.get(pid);
+    net.raw.set(pid, obj); net.seen.set(pid, Date.now());
+    const p = { name: cleanName(obj.name), team: String(obj.team || ""), buzz: obj.buzz ? String(obj.buzz) : null };
+    net.players.set(pid, p);
+    if (p.buzz && (!prev || prev.buzz !== p.buzz)) considerBuzz(pid);
+  };
+  net.fbListen = fb.listen(net.server, `rooms/${net.code}/players`, (type, path, data) => {
+    net.status = "online";
+    const parts = String(path || "/").split("/").filter(Boolean);
+    if (!parts.length) {
+      if (type === "put") { net.players.clear(); net.raw.clear(); }
+      if (data && typeof data === "object") for (const [pid, obj] of Object.entries(data)) applyOne(pid, type === "patch" ? Object.assign({}, net.raw.get(pid), obj) : obj);
+    } else if (parts.length === 1) {
+      applyOne(parts[0], data === null ? null : type === "patch" ? Object.assign({}, net.raw.get(parts[0]), data) : data);
+    } else {
+      const cur = Object.assign({}, net.raw.get(parts[0])); cur[parts[1]] = data; applyOne(parts[0], cur);
+    }
+    updatePlayersUI(); updateLobby();
+  }, st => {
+    const next = st === "ok" ? "online" : st === "denied" ? "denied" : "reconnecting";
+    if (next !== net.status) { net.status = next; updateLobby(); }
+    if (st === "ok" && !net.sentOnce) { net.sentOnce = true; sendNow(); }
+  });
+  updateLobby(); sendNow();
+}
+// drop players whose phones stopped checking in (closed tab, lost signal)
+setInterval(() => {
+  if (net.mode !== "fb" || app.role !== "host") return;
+  let changed = false;
+  for (const [pid, t] of net.seen) if (Date.now() - t > 35000) { net.seen.delete(pid); net.players.delete(pid); changed = true; }
+  if (changed) { updatePlayersUI(); updateLobby(); }
+}, 5000);
+setInterval(() => { if (net.mode === "fb" && app.role === "host") sendNow(); }, 4000);
+function startHostNet() { if (app.server) hostFB(); else hostP2P(); }
 function hostP2P() {
   if (typeof Peer !== "function") { net.mode = null; return; }
   net.mode = "p2p";
@@ -3539,6 +3643,7 @@ function onPlayerMsg(id, d) {
 
 // ---------- player side ----------
 function myId() {
+  if (net.mode === "fb") return net.pid;
   if (net.mode === "room") { const p = net.room && net.room.peers().find(x => x.sameTab); return p ? p.peer : null; }
   return net.peer ? net.peer.id : null;
 }
@@ -3548,9 +3653,41 @@ function playerSend(msg) {
     if (msg.t === "buzz") net.room.presence({ buzz: msg.token }).catch(() => {});
     if (msg.t === "bye") net.room.presence({ role: null, name: null, team: null, buzz: null }).catch(() => {});
   } else if (net.mode === "p2p" && net.conn && net.conn.open) { try { net.conn.send(msg); } catch {} }
+  else if (net.mode === "fb") {
+    const path = `rooms/${net.code}/players/${net.pid}`, ts = { ".sv": "timestamp" };
+    const req = msg.t === "hello" ? fb.send(net.server, path, "PUT", { name: msg.name, team: msg.team, buzz: null, hb: ts })
+      : msg.t === "buzz" ? fb.send(net.server, path, "PATCH", { buzz: msg.token, bt: ts })
+      : msg.t === "bye" ? fb.send(net.server, path, "DELETE") : null;
+    if (req) req.catch(() => { if (msg.t === "buzz") { app.buzzed = null; toast("Buzz didn't go through. Check your connection."); renderPlayer(); } });
+  }
 }
+function playerFB(server, code) {
+  net.mode = "fb"; net.server = server; net.code = code; net.pstatus = "connecting";
+  net.pid = LS.get("jp.pid", null); if (!net.pid) { net.pid = "p" + rid() + rid(); LS.set("jp.pid", net.pid); }
+  net.connStart = Date.now();
+  net.fbListen = fb.listen(server, `rooms/${code}/state`, (type, path, data) => {
+    if (path === "/" && type === "put") {
+      if (data && typeof data === "object") onHostState(data);
+      else { app.hostState = null; net.pstatus = "nohost"; renderPlayer(); }
+    }
+  }, st => {
+    if (st === "lost" && net.pstatus !== "lost") { net.pstatus = "lost"; renderPlayer(); }
+    if (st === "denied") { net.pstatus = "denied"; renderPlayer(); }
+  });
+  if (app.me.joined) playerSend({ t: "hello", name: app.me.name, team: app.me.team });
+  setInterval(() => { if (app.me.joined && net.mode === "fb") fb.send(net.server, `rooms/${net.code}/players/${net.pid}`, "PATCH", { hb: { ".sv": "timestamp" }, name: app.me.name, team: app.me.team }).catch(() => {}); }, 10000);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && net.mode === "fb") { net.fbListen.reopen(); if (app.me.joined) playerSend({ t: "hello", name: app.me.name, team: app.me.team }); }
+  });
+  renderPlayer();
+}
+const asList = v => Array.isArray(v) ? v.filter(x => x != null) : v && typeof v === "object" ? Object.keys(v).sort((a, b) => a - b).map(k => v[k]).filter(x => x != null) : [];
 function onHostState(d) {
-  if (!d || typeof d !== "object" || !Array.isArray(d.teams)) return;
+  if (!d || typeof d !== "object") return;
+  // Firebase stores lists as numbered objects and drops empty ones, so normalise them back into lists
+  d = Object.assign({}, d, { teams: asList(d.teams), answered: asList(d.answered) });
+  if (d.suck && typeof d.suck === "object") d.suck = Object.assign({}, d.suck, { out: asList(d.suck.out) });
+  if (!d.teams.length) return;
   const w = d.winner && typeof d.winner === "object" ? { peer: String(d.winner.peer), name: cleanName(d.winner.name), team: String(d.winner.team), kind: ["steal", "turn"].includes(d.winner.kind) ? d.winner.kind : "buzz" } : null;
   app.hostState = { title: String(d.title || ""), live: !!d.live, open: !!d.open, kind: d.kind === "steal" ? "steal" : "buzz", token: d.token ? String(d.token) : null,
     suck: d.suck && typeof d.suck === "object" ? { stage: String(d.suck.stage), value: +d.suck.value || 0, out: Array.isArray(d.suck.out) ? d.suck.out.map(String) : [], token: d.suck.token ? String(d.suck.token) : null,
@@ -3571,7 +3708,7 @@ function playerRoom(room) {
 }
 function playerP2P(code) {
   if (typeof Peer !== "function") { net.pstatus = "nolib"; renderPlayer(); return; }
-  net.mode = "p2p"; net.code = code; net.pstatus = "connecting"; renderPlayer();
+  net.mode = "p2p"; net.code = code; net.pstatus = "connecting"; net.connStart = Date.now(); renderPlayer();
   const peer = new Peer({ debug: 0 }); net.peer = peer;
   const schedule = ms => { clearTimeout(net.retry); net.retry = setTimeout(connect, ms); };
   function connect() {
@@ -3609,18 +3746,21 @@ function renderPlayer() {
     $("#app").innerHTML = `<div class="player">${top}<div class="pcard"><p class="pmsg">The buzzer can't connect here.</p><p style="color:var(--dim)">${IN_CLAUDE ? "Open the link your host sent while signed in to Claude." : "Check your internet connection and reload."}</p></div></div>`;
     return;
   }
-  const waitMsg = { connecting: "Connecting to the game…", nohost: "Can't find that game. Check the code or wait for the host.", lost: "Connection lost. Reconnecting…", nolib: "The buzzer couldn't load. Reload the page." }[net.pstatus];
+  const slow = net.pstatus === "connecting" && net.connStart && Date.now() - net.connStart > 12000;
+  const waitMsg = { connecting: slow ? (net.mode === "p2p" ? "Still connecting. Your phone may not be able to reach the host's laptop on this network. Ask the host to set up the buzzer server." : "Still connecting… Check your internet, or ask the host to reopen the game screen.") : "Connecting to the game…",
+    nohost: "Can't find that game yet. Ask the host to open the setup or game screen, or check the room code.", lost: "Connection lost. Reconnecting…", denied: "The buzzer server blocked this connection. The host needs to check the database rules.", nolib: "The buzzer couldn't load. Reload the page." }[net.pstatus];
   if (!me.joined || (st && !hasTeam)) {
     if (!$("#joinForm")) {
       $("#app").innerHTML = `<div class="player">${top}
-        <div class="pcard" id="joinForm"><h1>You're in</h1><p style="color:var(--dim);margin:0">Type your name and pick your team.</p>
+        <div class="pcard" id="joinForm"><h1>Join the game</h1><p style="color:var(--dim);margin:0">Type your name and pick your team.</p>
           <input id="pname" maxlength="24" placeholder="Your name" value="${esc(me.name)}" autocomplete="nickname">
           <div id="teamChoices" class="teamgrid"></div>
-          <button class="btn gold big" style="width:100%;justify-content:center" data-act="join">Join game</button>
-          ${net.mode === "p2p" ? `<button class="plink" data-act="changeCode">Use a different room code</button>` : ""}</div></div>`;
+          <button class="btn gold big" id="joinBtn" style="width:100%;justify-content:center" data-act="join">Join game</button>
+          ${net.mode === "p2p" || net.mode === "fb" ? `<button class="plink" data-act="changeCode">Use a different room code</button>` : ""}</div></div>`;
     }
     $("#teamChoices").innerHTML = st && teams.length ? teams.map(t => `<button style="--c:${t.color}" aria-pressed="${me.team === t.id}" data-act="pickTeam" data-t="${t.id}"><span class="dot" style="background:${t.color}"></span>${esc(t.name)}</button>`).join("")
       : `<p style="grid-column:1/-1;color:var(--dim);margin:.4rem 0">${esc(waitMsg || "Waiting for the host to open the game…")}</p>`;
+    const jb = $("#joinBtn"); if (jb) jb.disabled = !(st && teams.length);
     return;
   }
   const myT = teams.find(t => t.id === me.team), id = myId();
@@ -3682,6 +3822,7 @@ function pClockHTML() {
   return `<div class="pbar ${c.kind === "steal" || c.kind === "stealAnswer" ? "st" : ""}"><i style="width:${(frac * 100).toFixed(1)}%"></i></div><div class="pct"><span>${c.up ? "Time's up" : lab}</span><b>${c.up ? 0 : Math.ceil(left / 1000)}</b></div>`;
 }
 setInterval(() => { if (app.role === "player") { const el = $("#pclock"); if (el) el.innerHTML = pClockHTML(); } }, 100);
+setInterval(() => { if (app.role === "player" && net.pstatus === "connecting") renderPlayer(); }, 3000);
 function doBuzz(kind) {
   const st = app.hostState;
   if (kind === "qd") {
@@ -3698,10 +3839,11 @@ function doBuzz(kind) {
   if (navigator.vibrate) navigator.vibrate(60);
   renderPlayer();
 }
-function startPlayerWithCode(code) {
+function startPlayerWithCode(code, server) {
   app.needCode = false; $("#app").innerHTML = "";
-  if (history.replaceState) history.replaceState(null, "", baseUrl() + "#join=" + code);
-  playerP2P(code);
+  server = normServer(server) || app.server;
+  if (history.replaceState) history.replaceState(null, "", baseUrl() + "#join=" + code + (server ? "&s=" + serverHost(server) : ""));
+  if (server) playerFB(server, code); else playerP2P(code);
 }
 
 // ---------- events ----------
@@ -3727,7 +3869,17 @@ const actions = {
   export() { app.modal = { type: "export" }; renderModal(); },
   copyExport() { copyText($("#exp").value, "Code copied"); },
   copyLink() { copyText(joinUrl(net.code), "Join link copied"); },
-  newCode() { LS.del("jp.code"); openRoom(newCode(), 0); },
+  newCode() {
+    if (net.mode === "fb") { const old = net.code; fb.send(net.server, `rooms/${old}`, "DELETE").catch(() => {}); net.code = newCode(); LS.set("jp.code", net.code); hostFB(); return; }
+    LS.del("jp.code"); openRoom(newCode(), 0);
+  },
+  editServer() { app.editServer = true; updateLobby(); },
+  cancelServer() { app.editServer = false; updateLobby(); },
+  saveServer() {
+    const v = normServer($("#srvIn").value);
+    if (!v) { toast("That doesn't look like a Firebase database URL. It should end in firebaseio.com or firebasedatabase.app."); return; }
+    app.server = v; LS.set("jp.server", v); app.editServer = false; hostFB(); toast("Buzzer server saved");
+  },
   showCode() { app.modal = { type: "joinCode" }; renderModal(); },
   home() { stopTimer(); app.view = "library"; app.modal = null; if (document.fullscreenElement) document.exitFullscreen().catch(() => {}); render(); broadcast(); },
   tab(d) { app.tab = d.k === "final" ? "final" : +d.k; render(); },
@@ -3819,12 +3971,13 @@ const actions = {
     if (c.length !== 5) { toast("Room codes are 5 characters."); return; }
     startPlayerWithCode(c);
   },
-  changeCode() { if (net.peer) { try { net.peer.destroy(); } catch {} } net.mode = null; app.hostState = null; app.needCode = true; $("#app").innerHTML = ""; renderPlayer(); },
+  changeCode() { if (net.peer) { try { net.peer.destroy(); } catch {} } if (net.fbListen) net.fbListen.close(); net.mode = null; app.hostState = null; app.needCode = true; $("#app").innerHTML = ""; renderPlayer(); },
   pickTeam(d) { app.me.team = d.t; LS.set("jp.player", app.me); renderPlayer(); },
   join() {
     const name = cleanName($("#pname").value);
     if (!name) { toast("Type your name first."); return; }
-    if (!app.hostState || !app.hostState.teams.some(t => t.id === app.me.team)) { toast("Pick your team."); return; }
+    if (!app.hostState) { toast("Still connecting to the game. Hang on a second."); return; }
+    if (!app.hostState.teams.some(t => t.id === app.me.team)) { toast("Tap your team above first."); return; }
     app.me.name = name; app.me.joined = true; LS.set("jp.player", app.me);
     playerSend({ t: "hello", name, team: app.me.team });
     $("#app").innerHTML = ""; renderPlayer();
@@ -3898,12 +4051,14 @@ window.addEventListener("pagehide", () => { if (app.role === "player" && net.mod
 (async function boot() {
   const m = /[#&?]join=([A-Za-z0-9]{5})/.exec(location.hash + location.search);
   if (!IN_CLAUDE) {
-    if (m) { app.role = "player"; startPlayerWithCode(m[1].toUpperCase()); return; }
+    app.server = normServer(LS.get("jp.server", "") || DEFAULT_SERVER);
+    const sm = /[#&?]s=([A-Za-z0-9.-]+)/.exec(location.hash + location.search);
+    if (m) { app.role = "player"; startPlayerWithCode(m[1].toUpperCase(), sm ? sm[1] : ""); return; }
     if (/[#?]join\b/.test(location.hash + location.search)) { app.role = "player"; app.needCode = true; renderPlayer(); return; }
     app.role = "host";
     if (!Object.keys(app.games).length && !LS.get("jp.seeded", false)) { const g = sampleGame(); app.games[g.id] = g; persistLocal(); LS.set("jp.seeded", true); }
     setSync("Saved in this browser");
-    hostP2P(); render();
+    startHostNet(); render();
     return;
   }
   const [user, room, db] = await Promise.all([use("user"), use("room"), use("db")]);
