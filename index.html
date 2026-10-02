@@ -437,6 +437,13 @@ kbd{font:600 .68rem var(--f);color:var(--dim);border:1px solid var(--hair);borde
 .srv.ok b{color:var(--text);font-weight:600}
 .status.bad .dot{background:var(--bad)}
 #joinBtn:disabled{opacity:.45;filter:grayscale(.4)}
+/* long clues: tighter card so the text can stay as large as possible */
+.face.dense{padding:clamp(.9rem,2vw,1.8rem) clamp(1rem,3vw,2.6rem)}
+.face.dense .meta{margin-bottom:clamp(.6rem,1.4vw,1.2rem)}
+.face.dense .answer{margin-top:clamp(.6rem,1.6vw,1.4rem)}
+.face.dense .answer::before{margin-bottom:clamp(.5rem,1vw,.9rem)}
+.face.dense .clockslot{margin-top:clamp(.6rem,1.4vw,1.2rem)}
+.face.dense .ctext{line-height:1.16}
 
 </style>
 </head>
@@ -3149,6 +3156,7 @@ function renderPlay() {
   </div>`;
   app.intro = false;
   renderScores();
+  fitClue();
 }
 function renderScores() {
   const s = app.session, w = $("#dock"); if (!s || !w) return;
@@ -3327,7 +3335,30 @@ function ctrlHTML() {
   }
   return "";
 }
-function refreshMain() { const m = $("#main"); if (m) m.innerHTML = mainHTML(); renderScores(); litFace(); }
+function refreshMain() { const m = $("#main"); if (m) m.innerHTML = mainHTML(); renderScores(); litFace(); fitClue(); }
+// Long clues: keep the normal size when it fits, otherwise widen the line and shrink the text until the whole clue,
+// the answer space and the timer fit on the card without scrolling.
+function fitClue() {
+  const face = $("#main .face"); if (!face) return;
+  const t = face.querySelector(".ctext"), a = face.querySelector(".answer");
+  if (!t) return;
+  t.style.fontSize = ""; t.style.maxWidth = ""; if (a) a.style.fontSize = ""; face.classList.remove("dense");
+  const fits = () => face.scrollHeight <= face.clientHeight + 1;
+  if (fits()) return;
+  face.classList.add("dense");
+  // widen in pixels (a "ch" width would shrink along with the text)
+  t.style.maxWidth = Math.round(face.clientWidth * .9) + "px";
+  const base = parseFloat(getComputedStyle(t).fontSize), abase = a ? parseFloat(getComputedStyle(a).fontSize) : 0;
+  const apply = k => { t.style.fontSize = (base * k).toFixed(1) + "px"; if (a) a.style.fontSize = (abase * Math.max(k, .6)).toFixed(1) + "px"; };
+  if (fits()) return;
+  let lo = .25, hi = 1;
+  for (let i = 0; i < 9; i++) { const mid = (lo + hi) / 2; apply(mid); if (fits()) lo = mid; else hi = mid; }
+  apply(lo);
+}
+let fitTimer = null;
+window.addEventListener("resize", () => { clearTimeout(fitTimer); fitTimer = setTimeout(fitClue, 80); });
+document.addEventListener("fullscreenchange", () => setTimeout(fitClue, 120));
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => fitClue());
 function renderQueue() { const q = $("#queue"); if (q) q.innerHTML = queueHTML(); litFace(); }
 function litFace() {
   const s = app.session, f = $("#face"); if (!f || !s) return;
@@ -3596,7 +3627,7 @@ setInterval(() => {
   if (changed) { updatePlayersUI(); updateLobby(); }
 }, 5000);
 setInterval(() => { if (net.mode === "fb" && app.role === "host") sendNow(); }, 4000);
-function startHostNet() { if (app.server) hostFB(); else hostP2P(); }
+function startHostNet() { if (app.server && typeof EventSource === "function") hostFB(); else hostP2P(); }
 function hostP2P() {
   if (typeof Peer !== "function") { net.mode = null; return; }
   net.mode = "p2p";
@@ -3843,7 +3874,7 @@ function startPlayerWithCode(code, server) {
   app.needCode = false; $("#app").innerHTML = "";
   server = normServer(server) || app.server;
   if (history.replaceState) history.replaceState(null, "", baseUrl() + "#join=" + code + (server ? "&s=" + serverHost(server) : ""));
-  if (server) playerFB(server, code); else playerP2P(code);
+  if (server && typeof EventSource === "function") playerFB(server, code); else playerP2P(code);
 }
 
 // ---------- events ----------
