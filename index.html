@@ -444,6 +444,98 @@ kbd{font:600 .68rem var(--f);color:var(--dim);border:1px solid var(--hair);borde
 .face.dense .answer::before{margin-bottom:clamp(.5rem,1vw,.9rem)}
 .face.dense .clockslot{margin-top:clamp(.6rem,1.4vw,1.2rem)}
 .face.dense .ctext{line-height:1.16}
+/* account */
+.acct{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;justify-content:flex-end}
+.gbtn{background:#fff;color:#1F1F1F;border-color:#DADCE0;gap:.6rem}
+.gbtn:hover{background:#F7F8FA;border-color:#C6C9CE}
+.who-me{display:inline-flex;align-items:center;gap:.45rem;font-weight:600;font-size:.9rem}
+.who-me .av{width:1.8rem;height:1.8rem;border-radius:50%;display:grid;place-items:center;background:var(--tile-grad);color:#fff;font-size:.72rem;font-weight:700}
+/* photos */
+.photo-edit{border:1.5px dashed var(--line);border-radius:12px;padding:.9rem;display:flex;flex-direction:column;gap:.7rem;align-items:center;text-align:center;color:var(--muted);transition:border-color .15s,background .15s}
+.photo-edit.over{border-color:var(--blue);background:rgba(30,63,230,.08)}
+.photo-edit.has{border-style:solid}
+.photo-edit img{max-width:100%;max-height:220px;border-radius:8px;object-fit:contain;background:#000}
+.photo-edit p{margin:0;font-size:.9rem}
+.photo-edit.missing::before,.cimg.missing::before,.r-img.missing::before{content:"Photo not available on this device yet";font-size:.85rem;color:var(--dim)}
+.ed-card .ph{position:absolute;top:5px;left:5px;background:rgba(255,255,255,.18);color:#fff;font:700 .6rem/1 var(--f);padding:3px 5px;border-radius:4px}
+.face.photo{justify-content:flex-start;padding:clamp(.8rem,1.8vw,1.6rem)}
+.face.photo .meta{margin-bottom:clamp(.5rem,1.2vw,1rem);flex:none}
+.cimg{flex:1 1 0;min-height:0;width:100%;display:flex;align-items:center;justify-content:center}
+.cimg img{max-width:100%;max-height:100%;object-fit:contain;border-radius:12px;box-shadow:0 20px 50px rgba(0,0,20,.45),0 0 0 1px rgba(255,255,255,.12)}
+.face.photo .ctext.cap{flex:none;margin-top:clamp(.6rem,1.4vw,1.2rem);max-width:none;font-size:clamp(1.2rem,2.6vw,2.7rem)}
+.face.photo .answer{flex:none;margin-top:clamp(.5rem,1.2vw,1rem)}
+.face.photo .clockslot{flex:none;margin-top:clamp(.5rem,1.2vw,1rem);min-height:2.6rem}
+/* TV when the remote is connected */
+.stage.remote-on .ctrl{display:none}
+.pill.on{color:#9FF3C4;border-color:rgba(38,208,124,.4)}
+/* remote */
+.remote{min-height:100vh;min-height:100dvh;color:var(--text);padding:1rem 1rem 2.5rem;background:radial-gradient(90% 40% at 50% 0%,rgba(32,72,255,.2),transparent 70%),linear-gradient(180deg,#060B28,var(--studio));max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:.9rem}
+.rtop{display:flex;justify-content:space-between;align-items:center}
+.rtop .mark{color:#fff}.rtop .mark small{color:var(--dim);border-color:var(--hair)}
+.r-title{font:800 1.5rem/1.1 var(--fd);color:var(--dim)}
+.r-empty{text-align:center;padding:3rem .5rem;display:flex;flex-direction:column;gap:1rem;align-items:center}
+.r-empty h1{font-size:3rem}.r-empty p{margin:0;color:var(--dim);max-width:34ch}
+.r-sec{display:flex;flex-direction:column;gap:.55rem}
+.r-lab{font:800 .9rem/1 var(--fd);text-transform:uppercase;letter-spacing:.08em;color:var(--dim)}
+.r-chips{display:flex;flex-wrap:wrap;gap:.4rem}
+.r-chips button{display:inline-flex;align-items:center;gap:.45rem;background:rgba(255,255,255,.05);border:1px solid var(--hair);color:#fff;border-radius:10px;padding:.65rem .9rem;font-weight:600;cursor:pointer}
+.r-chips.big button{flex:1 1 40%;justify-content:center;padding:.95rem}
+.r-chips button.sel{background:var(--gold-grad);color:#2A1C00;border-color:transparent}
+.r-board{display:grid;grid-template-columns:repeat(var(--cols),1fr);gap:4px;background:#01030F;padding:5px;border-radius:12px}
+.r-cat{font:800 .72rem/1.05 var(--fd);text-transform:uppercase;text-align:center;padding:.4rem .15rem;background:linear-gradient(#142CA6,#0B1A6E);border-bottom:2px solid var(--g2);border-radius:5px 5px 2px 2px;display:grid;place-items:center;min-height:2.6rem;overflow:hidden;word-break:break-word}
+.r-tile{background:var(--tile-grad);border:0;border-radius:4px;padding:.8rem 0;font:900 1.15rem/1 var(--fd);color:var(--g2);cursor:pointer}
+.r-tile:disabled{background:#0A1250}
+.r-card{background:radial-gradient(120% 90% at 50% 0%,#2E52F4,#1535CC 45%,#0A1C8C);border-radius:14px;padding:.9rem 1rem;box-shadow:inset 0 1px 0 rgba(255,255,255,.3)}
+.r-meta{display:flex;justify-content:space-between;align-items:center;gap:.6rem}
+.r-meta span{font:800 1rem/1.1 var(--fd);text-transform:uppercase;letter-spacing:.05em;color:rgba(230,236,255,.85)}
+.r-meta b{font:900 1rem/1 var(--fd);background:var(--gold-grad);color:#2A1C00;padding:.3rem .55rem;border-radius:6px}
+.r-q{margin:.6rem 0 0;font-weight:700;font-size:1.05rem;line-height:1.35;text-transform:uppercase}
+.r-q.big{font:900 2rem/1 var(--fd)}
+.r-img{margin-top:.6rem;display:flex;justify-content:center}
+.r-img img{max-width:100%;max-height:200px;border-radius:8px;object-fit:contain}
+.r-ans{border:1px solid rgba(255,213,83,.4);background:rgba(255,213,83,.08);border-radius:12px;padding:.7rem .9rem}
+.r-ans small{display:block;color:var(--dim);font-size:.75rem;margin-bottom:.2rem}
+.r-ans b{font:900 1.5rem/1.1 var(--fd);text-transform:uppercase;letter-spacing:.02em;color:var(--g2)}
+.r-clock{display:flex;align-items:center;gap:.7rem;font:800 .95rem var(--fd);text-transform:uppercase;letter-spacing:.06em;color:var(--dim)}
+.r-clock b{font-size:1.6rem;color:#fff}.r-clock.up b,.r-clock.up span{color:var(--bad)}
+.r-clock .linkbtn{margin-left:auto;font-family:var(--f);text-transform:none;letter-spacing:0}
+.r-who{border-radius:14px;padding:.9rem;background:linear-gradient(180deg,color-mix(in srgb,var(--c) 25%,#0A0F2E),#0A0F2E);border:1px solid color-mix(in srgb,var(--c) 60%,transparent)}
+.r-who small{display:block;color:var(--dim);font-size:.78rem}
+.r-who b{display:block;font:900 2rem/1 var(--fd);text-transform:uppercase;color:var(--c)}
+.r-who span{font-weight:600}
+.r-yn{display:flex;gap:.5rem;margin-top:.8rem}
+.r-yn button{flex:1;border:0;border-radius:12px;padding:1.05rem .5rem;font-weight:800;font-size:1.05rem;cursor:pointer}
+.r-yn .ok{background:var(--ok);color:#01200F}.r-yn .no{background:var(--bad);color:#2A0000}
+.r-status{border-radius:12px;padding:.8rem .9rem;background:rgba(255,255,255,.05);border:1px solid var(--hair);font-weight:600}
+.r-status.live{color:#9FF3C4;border-color:rgba(38,208,124,.4)}
+.r-status.ok{color:#9FF3C4}
+.r-judge{display:grid;gap:.35rem}
+.r-judge div{display:flex;align-items:center;gap:.45rem;background:rgba(255,255,255,.04);border:1px solid var(--hair);border-radius:10px;padding:.35rem .4rem .35rem .7rem;font-weight:600}
+.r-judge small{color:var(--dim);font-weight:500}
+.r-judge button{margin-left:auto;background:rgba(255,255,255,.06);border:1px solid var(--hair);color:#fff;border-radius:8px;width:2.6rem;height:2.3rem;cursor:pointer;font-size:1rem}
+.r-judge button + button{margin-left:0}
+.r-judge button.sel.ok{background:var(--ok);color:#01200F}.r-judge button.sel.no{background:var(--bad);color:#2A0000}
+.r-actions{display:flex;gap:.5rem}.r-actions .btn{flex:1;padding:.85rem .5rem}
+.remote .btn{background:rgba(255,255,255,.06);border-color:var(--hair);color:#fff}
+.remote .btn.gold{background:var(--gold-grad);color:#2A1C00;border-color:transparent}
+.remote .btn.gbtn{background:#fff;color:#1F1F1F}
+.r-wide{width:100%}
+.r-input{display:flex;flex-direction:column;gap:.35rem;font-weight:600;font-size:.92rem}
+.r-input input{background:#fff;color:#0A0E2A;border:0;border-radius:10px;padding:.7rem .8rem;font:900 1.4rem var(--fd)}
+.r-scores{display:grid;gap:.35rem;margin-top:.4rem;padding-top:.9rem;border-top:1px solid var(--hair)}
+.r-team{display:flex;align-items:center;gap:.5rem;background:rgba(255,255,255,.04);border:1px solid var(--hair);border-radius:10px;padding:.4rem .45rem .4rem .7rem}
+.r-team.turn{border-color:rgba(255,213,83,.6)}
+.r-team .nm{flex:1;font-weight:600}.r-team em{font-style:normal;font-size:.68rem;font-weight:800;background:var(--gold-grad);color:#2A1C00;padding:.15rem .35rem;border-radius:4px;margin-left:.2rem}
+.r-team b{font:900 1.3rem/1 var(--fd);margin-right:.3rem}.r-team b.neg{color:#FF8A8A}
+.r-team button{background:rgba(255,255,255,.06);border:1px solid var(--hair);color:#fff;border-radius:7px;width:2rem;height:1.9rem;cursor:pointer}
+
+/* photo clues: the hidden answer takes no room until it's revealed */
+.face.photo .answer:not(.on){display:none}
+/* with the remote connected, the TV shows only what the room should see */
+.stage.remote-on .answering .row,.stage.remote-on .swap,.stage.remote-on .buzz .suckbtn,
+.stage.remote-on .suckstage .choose,.stage.remote-on .suckstage .row,.stage.remote-on .suckstage .suckq,.stage.remote-on .qdlink,
+.stage.remote-on .ddstage .choose,.stage.remote-on .ddstage .wagers,.stage.remote-on .ddstage .btn,.stage.remote-on .ddstage .ddnote,.stage.remote-on .ddstage .who,
+.stage.remote-on .wagers,.stage.remote-on .face > .btn,.stage.remote-on .round-done .btn,.stage.remote-on .pod .adj{display:none}
 
 </style>
 </head>
@@ -2833,7 +2925,7 @@ function newGame() {
     rounds: [blankRound("Jeopardy", 200), blankRound("Double Jeopardy", 400)], final: { cat: "", q: "", a: "" } };
 }
 function sampleGame() {
-  const g = newGame(); g.title = "Sample game"; g.useDouble = false;
+  const g = newGame(); g.title = "Sample game"; g.useDouble = false; g.sample = true;
   const data = [
     ["World capitals", [["France's capital, on the Seine","What is Paris?"],["Canada's capital city","What is Ottawa?"],["Australia's planned capital, not Sydney","What is Canberra?"],["Kenya's capital","What is Nairobi?"],["Bhutan's capital, in the Himalayas","What is Thimphu?"]]],
     ["Science", [["Its chemical formula is H2O","What is water?"],["The planet nicknamed the Red Planet","What is Mars?"],["The organelle known as the powerhouse of the cell","What is the mitochondrion?"],["The element with the symbol Fe","What is iron?"],["Light travels about this many kilometres per second in a vacuum","What is 300,000?"]]],
@@ -2874,10 +2966,11 @@ const net = { mode: null, room: null, peer: null, conns: new Map(), conn: null, 
 const saveTimers = {}, writing = {};
 function persistLocal() { LS.set("jp.games", app.games); }
 function scheduleSave(g) {
-  g.updated = Date.now(); persistLocal();
+  g.updated = Date.now(); delete g.sample; persistLocal();
   clearTimeout(saveTimers[g.id]); saveTimers[g.id] = setTimeout(() => flush(g.id), 900);
 }
 async function flush(id) {
+  if (cloud.user) { const g = app.games[id]; if (g) cloudSaveGame(g).then(() => setSync("Synced to your Google account")).catch(() => setSync("Couldn't sync. Saved in this browser.")); return; }
   if (!app.col) return;
   if (writing[id]) { writing[id] = "again"; return; }
   writing[id] = true;
@@ -2887,12 +2980,14 @@ async function flush(id) {
   if (again) flush(id);
 }
 function setSync(m) { app.syncMsg = m; const el = $("#sync"); if (el) el.textContent = m; }
-async function removeGame(id) { delete app.games[id]; persistLocal(); if (app.col) { try { await app.col.doc(id).delete(); } catch {} } }
-function saveSession() { if (app.session) LS.set("jp.session", app.session); else LS.del("jp.session"); }
+async function removeGame(id) { delete app.games[id]; persistLocal(); if (cloud.user) { userRef("games/" + id).remove().catch(() => {}); } if (app.col) { try { await app.col.doc(id).delete(); } catch {} } }
+function saveSession() { if (app.session) LS.set("jp.session", app.session); else LS.del("jp.session"); schedulePublish(); }
 
 // ---------- render root ----------
 function render() {
   if (app.role === "player") return renderPlayer();
+  if (app.role === "remote") return renderRemote();
+  schedulePublish();
   const v = app.view;
   if (v === "library") renderLibrary();
   else if (v === "editor") renderEditor();
@@ -2909,12 +3004,21 @@ function miniBoard(g) {
   for (let i = 0; i < rows; i++) r.cats.forEach(c => { s += `<span class="${c.clues[i] && c.clues[i].q.trim() ? "" : "e"}"></span>`; });
   return `<div class="mini" style="--cols:${r.cats.length}" aria-hidden="true">${s}</div>`;
 }
+function accountHTML() {
+  if (IN_CLAUDE) return `<span class="sync" id="sync">${esc(app.syncMsg)}</span>`;
+  if (cloud.user) {
+    const n = cloud.user.displayName || cloud.user.email || "You", ini = n.trim().split(/\s+/).map(x => x[0]).slice(0, 2).join("").toUpperCase();
+    return `<span class="sync" id="sync">${esc(app.syncMsg)}</span><span class="who-me"><span class="av">${esc(ini)}</span>${esc(n.split(" ")[0])}</span><button class="btn ghost" data-act="signOut">Sign out</button>`;
+  }
+  return `<span class="sync" id="sync">${esc(app.syncMsg)}</span><button class="btn gbtn" data-act="signIn">${G_ICON}Sign in with Google</button>`;
+}
+const G_ICON = `<svg viewBox="0 0 48 48" width="18" height="18" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>`;
 function renderLibrary() {
   const list = Object.values(app.games).sort((a, b) => b.updated - a.updated);
   const s = app.session;
   $("#app").innerHTML = `
   <div class="page">
-    <header class="top">${markHTML("host")}<div class="sync" id="sync">${esc(app.syncMsg)}</div></header>
+    <header class="top">${markHTML("host")}<div class="acct">${accountHTML()}</div></header>
     ${s ? `<div class="resume"><div>Game in progress: <b>${esc(s.title)}</b></div><div class="row"><button class="btn ghost" data-act="endSession">End it</button><button class="btn gold" data-act="resume">Resume game</button></div></div>` : ""}
     <div class="lib-head"><h1>Your games</h1>
       <div class="row"><button class="btn" data-act="paste">Import</button><button class="btn primary" data-act="new">New game</button></div></div>
@@ -2931,6 +3035,7 @@ function renderLibrary() {
       <div><h3>Buzzers on any phone</h3><p>${net.mode === "room"
         ? "In this Claude version, players need to be signed in to Claude. Use the standalone copy of this page for buzzers that need no account."
         : "When you start a game, a room code and QR code appear. Players scan it or open the link, type a name, pick a team and buzz. No account or app needed."}</p></div>
+      ${!IN_CLAUDE ? `<div><h3>Your games everywhere</h3><p>${cloud.user ? "You're signed in, so your games and photos stay in sync on every device where you sign in." : "Sign in with Google to keep your games and photos on every device. Only you can see them. Players never need to sign in."}</p></div>` : ""}
       <div><h3>Host from one screen</h3><p>Put the board on a TV or projector in full screen. Space reveals answers, B opens buzzers, Esc returns to the board.</p></div>
       ${!IN_CLAUDE ? `<div><h3>Joining as a player?</h3><p><button class="linkbtn" data-act="asPlayer">Enter a room code</button></p></div>` : ""}
     </section>
@@ -2995,8 +3100,8 @@ function renderEditor() {
   </div>`;
 }
 function cardHTML(cl, ci, i) {
-  return `<button class="ed-card ${cl.q.trim() ? "filled" : ""}" data-act="clue" data-c="${ci}" data-i="${i}" id="card-${ci}-${i}">
-    <span class="v">$${cl.value.toLocaleString()}</span><span class="p">${cl.q.trim() ? esc(cl.q) : "Add clue"}</span>${cl.dd ? '<b class="dd">DD</b>' : ""}</button>`;
+  return `<button class="ed-card ${cl.q.trim() || cl.img ? "filled" : ""}" data-act="clue" data-c="${ci}" data-i="${i}" id="card-${ci}-${i}">
+    <span class="v">$${cl.value.toLocaleString()}</span><span class="p">${cl.q.trim() ? esc(cl.q) : cl.img ? "Photo clue" : "Add clue"}</span>${cl.dd ? '<b class="dd">DD</b>' : ""}${cl.img ? '<b class="ph">Photo</b>' : ""}</button>`;
 }
 function refreshCard(ci, i) {
   const g = app.games[app.editId], el = $(`#card-${ci}-${i}`); if (!g || !el) return;
@@ -3013,6 +3118,12 @@ function renderModal() {
       <h2>${esc(cat.name || "Category " + (m.c + 1))}, $${cl.value.toLocaleString()}</h2>
       <label class="field"><span>Clue</span><textarea data-bind="clue.q" id="clue-q" placeholder="What you'll read out">${esc(cl.q)}</textarea></label>
       <label class="field"><span>Answer</span><input data-bind="clue.a" value="${esc(cl.a)}" placeholder="What is…?"></label>
+      <div class="field"><span>Photo (optional)</span>
+        <div class="photo-edit ${cl.img ? "has" : ""}" id="photoDrop">
+          ${cl.img ? `<img data-img="${esc(cl.img)}" alt="Clue photo">` : `<p>Drop a photo here or paste one</p>`}
+          <div class="row"><label class="btn">${cl.img ? "Replace photo" : "Choose photo"}<input type="file" accept="image/*" id="photoIn" hidden></label>${cl.img ? `<button class="btn ghost danger" data-act="removePhoto">Remove</button>` : ""}</div>
+        </div>
+        <small class="muted">With a photo, the TV shows the picture and uses the clue text as its caption.</small></div>
       <div class="two">
         <label class="field"><span>Value</span><input type="number" min="0" step="100" data-bind="clue.value" value="${cl.value}"></label>
         <label class="field" style="padding-bottom:.7rem"><span class="row"><input type="checkbox" data-bind="clue.dd" ${cl.dd ? "checked" : ""}> Daily Double</span></label>
@@ -3021,18 +3132,35 @@ function renderModal() {
         <div class="row"><button class="btn ghost" data-act="clueNav" data-d="-1">‹ Previous</button><button class="btn ghost" data-act="clueNav" data-d="1">Next ›</button></div>
         <button class="btn primary" data-act="closeModal" data-force="1">Done</button>
       </div></div></div>`;
-    setTimeout(() => { const q = $("#clue-q"); if (q) q.focus(); }, 0);
+    setTimeout(() => { const q = $("#clue-q"); if (q && !cl.img) q.focus(); }, 0);
+    hydrateImages(root);
   } else if (m.type === "export") {
     const g = app.games[app.editId];
     root.innerHTML = `<div class="modal-back" data-act="closeModal"><div class="modal" role="dialog" aria-modal="true" aria-label="Export game">
       <h2>Export this game</h2><p class="muted" style="margin-top:0">Copy this code to back up the game or move it to another copy of this app. Import it from the games list.</p>
-      <label class="field"><textarea id="exp" readonly style="font:12px/1.4 ui-monospace,monospace;min-height:12rem">${esc(JSON.stringify(g))}</textarea></label>
+      <label class="field"><textarea id="exp" readonly style="font:12px/1.4 ui-monospace,monospace;min-height:12rem">Preparing…</textarea></label>
       <div class="foot"><span></span><div class="row"><button class="btn ghost" data-act="closeModal" data-force="1">Close</button><button class="btn primary" data-act="copyExport">Copy code</button></div></div></div></div>`;
+    (async () => {
+      const out = clone(g), ims = {};
+      for (const r of out.rounds) for (const c of r.cats) for (const cl of c.clues) if (cl.img) { const v = await getImage(cl.img); if (v) ims[cl.img] = v; }
+      if (Object.keys(ims).length) out._images = ims;
+      const t = $("#exp"); if (t) t.value = JSON.stringify(out);
+    })();
   } else if (m.type === "import") {
     root.innerHTML = `<div class="modal-back" data-act="closeModal"><div class="modal" role="dialog" aria-modal="true" aria-label="Import game">
       <h2>Import a game</h2><p class="muted" style="margin-top:0">Paste a code exported from this app.</p>
       <label class="field"><textarea id="imp" style="font:12px/1.4 ui-monospace,monospace;min-height:12rem" placeholder="Paste the code here"></textarea></label>
       <div class="foot"><span></span><div class="row"><button class="btn ghost" data-act="closeModal" data-force="1">Cancel</button><button class="btn primary" data-act="doImport">Import game</button></div></div></div></div>`;
+  } else if (m.type === "remote") {
+    const url = baseUrl() + "#remote";
+    root.innerHTML = `<div class="modal-back dark-modal" data-act="closeModal"><div class="modal" role="dialog" aria-modal="true" aria-label="Host remote" style="text-align:center">
+      <h2>Host remote</h2>
+      ${cloud.user ? `<p style="color:var(--dim);margin-top:0">Scan this with <b style="color:#fff">your</b> phone and sign in with <b style="color:#fff">${esc(cloud.user.email || "the same Google account")}</b>. You'll see each answer privately and can run the whole game from your phone.</p>
+        <div class="qrbig">${qrSVG(url)}</div><p class="joinurl">${esc(url)}</p>
+        <p class="note" style="color:var(--dim)">Players can't use it: the remote only opens for your Google account. When it connects, the controls on the TV hide automatically.</p>`
+      : `<p style="color:var(--dim);margin-top:0">The remote opens only for your Google account, so sign in on this screen first. Then scan the code with your phone and sign in there with the same account.</p>
+        <button class="btn gbtn" data-act="signIn">${G_ICON}Sign in with Google</button>`}
+      <div style="margin-top:1.2rem"><button class="btn gold" data-act="closeModal" data-force="1">Done</button></div></div></div>`;
   } else if (m.type === "joinCode") {
     root.innerHTML = `<div class="modal-back dark-modal" data-act="closeModal"><div class="modal" role="dialog" aria-modal="true" aria-label="Join code" style="text-align:center">
       <p class="codelabel">Scan to join, or go to the link and enter</p><div class="code" style="font-size:clamp(3rem,10vw,5rem)">${esc(net.code || "")}</div>
@@ -3072,6 +3200,7 @@ function renderSetup() {
       <div class="panel join" id="joinPanel">${joinPanelHTML()}</div>
     </div>
     <div class="row" style="margin-top:1.6rem;justify-content:flex-end">
+      ${!IN_CLAUDE ? `<button class="btn big" data-act="showRemote">Host remote</button>` : ""}
       <button class="btn primary big" data-act="start">Start game</button>
     </div>
   </div>`;
@@ -3150,13 +3279,13 @@ function renderPlay() {
   $("#app").innerHTML = `
   <div class="stage" id="stage">
     <div class="stagebar">${markHTML(esc(rn))}
-      <div class="row">${connHTML()}<button class="btn" data-act="full">Full screen</button><button class="btn" data-act="home">Exit</button></div></div>
+      <div class="row">${remotePillHTML()}${connHTML()}<button class="btn" data-act="full">Full screen</button><button class="btn" data-act="home">Exit</button></div></div>
     <div class="stagemain" id="main">${mainHTML()}</div>
     <div id="dock"></div>
   </div>`;
   app.intro = false;
   renderScores();
-  fitClue();
+  fitClue(); hydrateImages($("#main")); updateRemotePill();
 }
 function renderScores() {
   const s = app.session, w = $("#dock"); if (!s || !w) return;
@@ -3204,9 +3333,9 @@ function mainHTML() {
   if (s.phase === "clue") {
     const cl = curClue(), cat = s.rounds[s.cur.r].cats[s.cur.c], ddTeam = s.dd ? teamById(s.dd.team) : null;
     return `<div class="clue">
-      <div class="face" id="face">
+      <div class="face ${cl.img ? "photo" : ""}" id="face">
         <div class="meta"><span>${esc(cat.name)}</span><b>${s.dd ? "Daily Double, " + money(s.dd.wager) : money(cl.value)}</b>${ddTeam ? `<span>${esc(ddTeam.name)}</span>` : ""}</div>
-        <div class="ctext">${esc(cl.q)}</div>
+        ${cl.img ? `<div class="cimg"><img data-img="${esc(cl.img)}" alt=""></div>${cl.q.trim() ? `<div class="ctext cap">${esc(cl.q)}</div>` : ""}` : `<div class="ctext">${esc(cl.q)}</div>`}
         <div class="answer ${s.show ? "on" : ""}" id="ans">${esc(cl.a)}</div>
         <div id="clock" class="clockslot">${clockHTML()}</div>
       </div>
@@ -3217,7 +3346,7 @@ function mainHTML() {
   if (s.phase === "final-cat") return `<div class="face plain" style="height:100%"><div class="meta">Final Jeopardy</div><div class="bigword" style="font-size:clamp(2.6rem,8vw,7rem)">${esc(s.final.cat)}</div>
     <button class="btn gold big" style="margin-top:2.2rem" data-act="finWagers">Take wagers</button></div>`;
   if (s.phase === "final-wager") return `<div class="face" style="height:100%"><div class="meta"><span>Final Jeopardy</span><b>${esc(s.final.cat)}</b></div>
-    <div class="ctext" style="font-size:clamp(1.3rem,3vw,2.4rem)">Enter each team's wager</div>
+    <div class="ctext" style="font-size:clamp(1.3rem,3vw,2.4rem)">${remoteOn() ? "Teams are locking in their wagers" : "Enter each team's wager"}</div>
     <div class="wagers">${s.teams.map(t => { const max = Math.max(0, t.score); return `<label style="border-top:4px solid ${t.color}">${esc(t.name)}
       <input type="number" min="0" max="${max}" step="100" data-bind="finWager" data-t="${t.id}" value="${s.fin.wagers[t.id] ?? ""}" ${max === 0 ? "disabled" : ""}><small>${max === 0 ? "No points to wager" : "Up to " + money(max)}</small></label>`; }).join("")}</div>
     <button class="btn gold big" style="margin-top:1.6rem" data-act="finClue">Show the clue</button></div>`;
@@ -3335,7 +3464,7 @@ function ctrlHTML() {
   }
   return "";
 }
-function refreshMain() { const m = $("#main"); if (m) m.innerHTML = mainHTML(); renderScores(); litFace(); fitClue(); }
+function refreshMain() { const m = $("#main"); if (m) m.innerHTML = mainHTML(); renderScores(); litFace(); fitClue(); hydrateImages(m); }
 // Long clues: keep the normal size when it fits, otherwise widen the line and shrink the text until the whole clue,
 // the answer space and the timer fit on the card without scrolling.
 function fitClue() {
@@ -3344,6 +3473,13 @@ function fitClue() {
   if (!t) return;
   t.style.fontSize = ""; t.style.maxWidth = ""; if (a) a.style.fontSize = ""; face.classList.remove("dense");
   const fits = () => face.scrollHeight <= face.clientHeight + 1;
+  if (face.classList.contains("photo")) {
+    // the photo gets the room; the caption stays within about a quarter of the card
+    const base = parseFloat(getComputedStyle(t).fontSize), cap = face.clientHeight * .2;
+    let k = 1;
+    while ((t.offsetHeight > cap || !fits()) && k > .3) { k *= .92; t.style.fontSize = (base * k).toFixed(1) + "px"; }
+    return;
+  }
   if (fits()) return;
   face.classList.add("dense");
   // widen in pixels (a "ch" width would shrink along with the text)
@@ -3877,6 +4013,361 @@ function startPlayerWithCode(code, server) {
   if (server && typeof EventSource === "function") playerFB(server, code); else playerP2P(code);
 }
 
+
+// ===================== account sync, photos, host remote =====================
+const FB_CONFIG = { apiKey: "AIzaSyA7nGWRHdXr47pahq0YJ9Yof4uvvB8BYws", authDomain: "jeopardy-buzzers.firebaseapp.com",
+  databaseURL: "https://jeopardy-buzzers-default-rtdb.firebaseio.com", projectId: "jeopardy-buzzers", appId: "1:904543505117:web:ea6122e0460e00c5fe2934" };
+const FB_VER = "10.12.2";
+const cloud = { ready: false, failed: false, loading: null, user: null, db: null, auth: null, refs: [], offset: 0 };
+function loadScript(src) { return new Promise((res, rej) => { const el = document.createElement("script"); el.src = src; el.onload = res; el.onerror = rej; document.head.appendChild(el); }); }
+function cloudInit() {
+  if (IN_CLAUDE) return Promise.resolve(false);
+  if (cloud.loading) return cloud.loading;
+  cloud.loading = (async () => {
+    try {
+      for (const m of ["app", "auth", "database"]) await loadScript(`https://www.gstatic.com/firebasejs/${FB_VER}/firebase-${m}-compat.js`);
+      firebase.initializeApp(FB_CONFIG);
+      cloud.auth = firebase.auth(); cloud.db = firebase.database(); cloud.ready = true;
+      cloud.db.ref(".info/serverTimeOffset").on("value", sn => { cloud.offset = sn.val() || 0; });
+      cloud.auth.onAuthStateChanged(u => onCloudUser(u));
+      return true;
+    } catch (e) { cloud.failed = true; if (app.role === "remote") renderRemote(); else if (app.view === "library") renderLibrary(); return false; }
+  })();
+  return cloud.loading;
+}
+const serverNow = () => Date.now() + (cloud.offset || 0);
+async function signIn() {
+  await cloudInit();
+  if (!cloud.ready) { toast("Sign-in couldn't load. Check your internet and try again."); return; }
+  const p = new firebase.auth.GoogleAuthProvider(); p.setCustomParameters({ prompt: "select_account" });
+  try { await cloud.auth.signInWithPopup(p); }
+  catch (e) {
+    if (e && (e.code === "auth/popup-blocked" || e.code === "auth/operation-not-supported-in-this-environment")) { try { await cloud.auth.signInWithRedirect(p); } catch { toast("Sign-in didn't work. Try again."); } }
+    else if (e && e.code !== "auth/popup-closed-by-user" && e.code !== "auth/cancelled-popup-request") toast("Sign-in didn't work: " + (e.message || "try again"));
+  }
+}
+function signOut() { if (cloud.auth) cloud.auth.signOut(); }
+const userRef = path => cloud.db.ref(`users/${cloud.user.uid}/${path}`);
+function detachCloud() { cloud.refs.forEach(r => r.off()); cloud.refs = []; }
+const asArr = v => Array.isArray(v) ? v.filter(x => x != null) : v && typeof v === "object" ? Object.keys(v).sort((a, b) => a - b).map(k => v[k]).filter(x => x != null) : [];
+function fixGame(g) {
+  // Firebase stores lists as numbered objects and drops empty values; rebuild the shape the app expects
+  const out = Object.assign(newGame(), g);
+  out.rounds = asArr(g.rounds).map(r => ({ name: r.name || "", cats: asArr(r.cats).map(c => ({ name: c.name || "", clues: asArr(c.clues).map(cl => ({ value: +cl.value || 0, q: cl.q || "", a: cl.a || "", dd: !!cl.dd, img: cl.img || undefined })) })) }));
+  while (out.rounds.length < 2) out.rounds.push(blankRound("Double Jeopardy", 400));
+  out.final = Object.assign({ cat: "", q: "", a: "" }, g.final || {});
+  return out;
+}
+function onCloudUser(u) {
+  detachCloud(); cloud.user = u || null;
+  if (app.role === "remote") return remoteUser();
+  if (!u) { setSync("Saved in this browser"); render(); return; }
+  setSync("Syncing…");
+  const known = new Set(LS.get("jp.synced", []));
+  const gamesRef = userRef("games"); cloud.refs.push(gamesRef);
+  gamesRef.on("value", snap => {
+    const remote = snap.val() || {};
+    for (const [id, raw] of Object.entries(remote)) {
+      if (!raw || !raw.rounds) continue;
+      const g = fixGame(raw), local = app.games[id];
+      if (!local || (local.updated || 0) < (g.updated || 0)) app.games[id] = g;
+      else if ((local.updated || 0) > (g.updated || 0)) cloudSaveGame(local);
+      known.add(id);
+    }
+    for (const id of Object.keys(app.games)) if (!remote[id]) {
+      if (known.has(id)) { delete app.games[id]; known.delete(id); }   // deleted on another device
+      else if (app.games[id].sample && Object.keys(remote).length) delete app.games[id];   // untouched sample on a new device
+      else { cloudSaveGame(app.games[id]); known.add(id); }              // new on this device
+    }
+    LS.set("jp.synced", [...known]); persistLocal();
+    setSync("Synced to your Google account");
+    if (app.view === "library" && !app.modal) renderLibrary();
+  }, () => setSync("Couldn't sync. Saved in this browser."));
+  userRef("settings").once("value").then(sn => {
+    const v = sn.val();
+    if (v && v.rules) { app.rules = Object.assign(app.rules, v.rules); LS.set("jp.rules", app.rules); }
+    if (v && v.teams) { app.teams = asArr(v.teams); LS.set("jp.teams", app.teams); }
+    if (app.view === "setup") renderSetup();
+  }).catch(() => {});
+  uploadLocalImages();
+  hostRemoteListen();
+  render();
+}
+function cloudSaveGame(g) {
+  if (!cloud.user || !g) return Promise.resolve();
+  const data = clone(g); delete data._images;
+  return userRef("games/" + g.id).set(data).then(() => { const k = new Set(LS.get("jp.synced", [])); k.add(g.id); LS.set("jp.synced", [...k]); });
+}
+function cloudSaveSettings() { if (cloud.user) userRef("settings").set({ rules: app.rules, teams: app.teams }).catch(() => {}); }
+// ---- photos: stored on this device (IndexedDB) and in your account when signed in ----
+const idb = {
+  open() { if (!this.p) this.p = new Promise((res, rej) => { const r = indexedDB.open("jeopardy-host", 1); r.onupgradeneeded = () => r.result.createObjectStore("images"); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); return this.p; },
+  async get(k) { try { const db = await this.open(); return await new Promise(res => { const q = db.transaction("images").objectStore("images").get(k); q.onsuccess = () => res(q.result || null); q.onerror = () => res(null); }); } catch { return null; } },
+  async set(k, v) { try { const db = await this.open(); return await new Promise(res => { const tx = db.transaction("images", "readwrite"); tx.objectStore("images").put(v, k); tx.oncomplete = () => res(true); tx.onerror = () => res(false); }); } catch { return false; } }
+};
+const imgCache = new Map();
+async function getImage(id) {
+  if (!id) return null;
+  if (imgCache.has(id)) return imgCache.get(id);
+  let v = await idb.get(id);
+  if (!v && cloud.user) { try { v = (await userRef("images/" + id).once("value")).val(); if (v) idb.set(id, v); } catch {} }
+  if (v) imgCache.set(id, v);
+  return v;
+}
+async function putImage(id, data) {
+  imgCache.set(id, data); await idb.set(id, data);
+  if (cloud.user) { try { await userRef("images/" + id).set(data); markImgSynced(id); } catch {} }
+}
+function markImgSynced(id) { const k = new Set(LS.get("jp.imgSynced", [])); k.add(id); LS.set("jp.imgSynced", [...k]); }
+async function uploadLocalImages() {
+  if (!cloud.user) return;
+  const done = new Set(LS.get("jp.imgSynced", []));
+  const ids = new Set(); Object.values(app.games).forEach(g => g.rounds.forEach(r => r.cats.forEach(c => c.clues.forEach(cl => { if (cl.img) ids.add(cl.img); }))));
+  for (const id of ids) if (!done.has(id)) { const v = await idb.get(id); if (v) { try { await userRef("images/" + id).set(v); markImgSynced(id); } catch {} } }
+}
+function hydrateImages(root) {
+  (root || document).querySelectorAll("img[data-img]:not([data-loaded])").forEach(el => {
+    el.dataset.loaded = "1";
+    getImage(el.dataset.img).then(v => {
+      if (v) { el.onload = () => fitClue(); el.src = v; }
+      else { const box = el.closest(".cimg,.photo-edit,.ed-thumb,.r-img"); if (box) box.classList.add("missing"); }
+    });
+  });
+}
+async function processImage(file) {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = new Image(); img.src = url; await img.decode();
+    const w = img.naturalWidth, h = img.naturalHeight, k = Math.min(1, 1600 / Math.max(w, h));
+    const c = document.createElement("canvas"); c.width = Math.round(w * k); c.height = Math.round(h * k);
+    const ctx = c.getContext("2d"); ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, c.width, c.height); ctx.drawImage(img, 0, 0, c.width, c.height);
+    let q = .86, data = c.toDataURL("image/jpeg", q);
+    while (data.length * .75 > 260000 && q > .5) { q -= .07; data = c.toDataURL("image/jpeg", q); }
+    return { data, small: Math.max(w, h) < 900 };
+  } finally { URL.revokeObjectURL(url); }
+}
+async function attachPhoto(file) {
+  const m = app.modal; if (!m || m.type !== "clue" || !file) return;
+  if (!/^image\//.test(file.type || "image/")) { toast("That file isn't a photo."); return; }
+  toast("Adding photo…", 1500);
+  try {
+    const r = await processImage(file), id = "i" + rid() + rid();
+    await putImage(id, r.data);
+    const g = app.games[app.editId], cl = g.rounds[app.tab].cats[m.c].clues[m.i];
+    cl.img = id; scheduleSave(g); renderModal(); refreshCard(m.c, m.i);
+    if (r.small) toast("Added. This photo is small, so it may look soft on a big TV.", 4500);
+  } catch { toast("That photo couldn't be opened. Try a JPG or PNG."); }
+}
+// ---- host remote (TV side) ----
+let pubTimer = null;
+function schedulePublish() { if (!cloud.user || app.role !== "host") return; clearTimeout(pubTimer); pubTimer = setTimeout(publishRemote, 80); }
+function remoteView() {
+  const s = app.session, base = { at: firebase.database.ServerValue.TIMESTAMP };
+  if (!s || app.view !== "play") return Object.assign(base, { idle: true, view: app.view });
+  const maxW = s.rounds[s.round] ? Math.max(...s.rounds[s.round].cats.flatMap(c => c.clues.map(x => x.value))) : 0;
+  const v = Object.assign(base, { idle: false, title: s.title, phase: s.phase, round: s.round, turn: s.turn || "", show: !!s.show,
+    teams: s.teams.map(t => ({ id: t.id, name: t.name, color: t.color, score: t.score })) });
+  if (s.phase === "board") {
+    const r = s.rounds[s.round], done = roundDone(s.round);
+    v.board = { cats: r.cats.map(c => c.name || ""), cells: r.cats.map((c, ci) => c.clues.map((cl, i) => ({ v: cl.value, st: !cl.q.trim() && !cl.img ? "e" : s.used[`${s.round}-${ci}-${i}`] ? "u" : "o" }))),
+      done, next: done ? (s.round + 1 < s.rounds.length ? "Start Double Jeopardy" : s.final ? "Go to Final Jeopardy" : "Show final scores") : "" };
+  }
+  if (s.cur && (s.phase === "clue" || s.phase === "dd" || s.phase === "suck")) {
+    const cl = curClue(), cat = s.rounds[s.cur.r].cats[s.cur.c];
+    v.clue = { cat: cat.name || "", value: cl.value, q: cl.q, a: cl.a, img: cl.img || "" };
+    if (s.dd) { const t = teamById(s.dd.team); v.dd = { team: s.dd.team || "", wager: s.dd.wager || 0, max: t ? Math.max(t.score, maxW) : maxW, penalty: s.ddPenalty !== false }; }
+  }
+  if (s.phase === "clue") {
+    const b = s.buzz, key = `${s.cur.r}-${s.cur.c}-${s.cur.i}`;
+    v.buzz = { open: b.open, kind: b.kind, winner: b.winner ? { team: b.winner.team, name: b.winner.name || "", kind: b.winner.kind } : null, answered: b.answered, solved: b.solved,
+      timedOut: b.timedOut || "", res: s.res[key] || {}, canSuck: canSuck(), allMissed: allMissed(), canOpen: !!net.mode && !b.open && !b.solved && !b.winner && eligibleTeams().length > 0, eligible: eligibleTeams().map(t => t.id) };
+  }
+  if (s.clock && (s.phase === "clue")) v.clock = { kind: s.clock.kind, left: Math.max(0, s.clock.ends - Date.now()), total: s.clock.total, up: !!s.clock.up };
+  if (s.phase === "suck" && s.suck) v.suck = { stage: s.suck.stage, value: s.suck.value, winner: s.suck.winner ? s.suck.winner.team : "", reason: s.suck.reason || "" };
+  if (s.phase.startsWith("final") || s.phase === "end") v.fin = s.final ? { cat: s.final.cat, q: s.final.q, a: s.final.a, wagers: s.fin.wagers, res: s.fin.res, timer: app.timerLeft || 0, running: !!app.timer } : null;
+  return v;
+}
+function publishRemote() {
+  if (!cloud.user || app.role !== "host") return;
+  try { const v = remoteView(); const clean = JSON.parse(JSON.stringify(v)); clean.at = firebase.database.ServerValue.TIMESTAMP; userRef("remote/view").set(clean).catch(() => {}); } catch {}
+}
+let remoteSeen = 0;
+function hostRemoteListen() {
+  if (app.role !== "host" || !cloud.user) return;
+  const cmdRef = userRef("remote/cmd"); cloud.refs.push(cmdRef);
+  cmdRef.on("child_added", snap => {
+    const c = snap.val(); snap.ref.remove();
+    if (!c || !c.a || serverNow() - (c.at || 0) > 20000) return;
+    runRemote(c.a, c.d || {});
+  });
+  const pingRef = userRef("remote/ping"); cloud.refs.push(pingRef);
+  pingRef.on("value", sn => { const t = sn.val(); if (t && serverNow() - t < 25000) { remoteSeen = Date.now(); updateRemotePill(); } });
+  schedulePublish();
+}
+setInterval(() => { if (app.role === "host" && app.view === "play") updateRemotePill(); }, 5000);
+const remoteOn = () => Date.now() - remoteSeen < 25000;
+function updateRemotePill() {
+  const st = $("#stage"); if (!st) return;
+  st.classList.toggle("remote-on", remoteOn() && !app.showCtrl);
+  const p = $("#rpill"); if (p) p.outerHTML = remotePillHTML();
+}
+const remotePillHTML = () => cloud.user ? (remoteOn() ? `<button class="pill on" id="rpill" data-act="toggleCtrl">Remote connected${app.showCtrl ? ", hide TV controls" : ", show TV controls"}</button>` : `<button class="pill" id="rpill" data-act="showRemote">Host remote</button>`) : (IN_CLAUDE ? `<span id="rpill"></span>` : `<button class="pill" id="rpill" data-act="showRemote">Host remote</button>`);
+function runRemote(a, d) {
+  const s = app.session; if (!s || app.view !== "play") return;
+  const ph = s.phase;
+  const ok = {
+    open: () => ph === "board" && !roundDone(s.round) && (() => { const cl = s.rounds[s.round].cats[+d.c] && s.rounds[s.round].cats[+d.c].clues[+d.i]; return cl && (cl.q.trim() || cl.img) && !s.used[`${s.round}-${+d.c}-${+d.i}`]; })() && openClue(+d.c, +d.i),
+    turn: () => actions.setTurn({ t: d.t || "" }),
+    adj: () => actions.adj({ t: d.t, d: +d.d }),
+    next: () => ph === "board" && roundDone(s.round) && (s.round + 1 < s.rounds.length ? actions.nextRound() : s.final ? actions.toFinal() : actions.toEnd()),
+    back: () => (ph === "clue") && backToBoard(),
+    reveal: () => (ph === "clue" || ph === "final-clue") && actions.reveal(),
+    buzz: () => ph === "clue" && toggleBuzz(),
+    judge: () => ph === "clue" && judge(d.t, d.v),
+    suck: () => actions.suck(),
+    suckAward: () => ph === "suck" && actions.suckAward({ t: d.t }),
+    suckNobody: () => ph === "suck" && actions.suckNobody(),
+    suckUndo: () => ph === "suck" && actions.suckUndo(),
+    suckReveal: () => ph === "suck" && actions.suckReveal(),
+    suckDone: () => ph === "suck" && actions.suckDone(),
+    ddTeam: () => ph === "dd" && actions.ddTeam({ t: d.t }),
+    ddGo: () => ph === "dd" && actions.ddGo({ w: +d.w }),
+    finWagers: () => ph === "final-cat" && actions.finWagers(),
+    finWager: () => { if (ph === "final-wager") { s.fin.wagers[d.t] = d.w === "" ? "" : +d.w; saveSession(); refreshMain(); } },
+    finClue: () => ph === "final-wager" && actions.finClue(),
+    finJudge: () => ph === "final-clue" && finJudge(d.t, d.v),
+    timer: () => ph === "final-clue" && actions.timer(),
+    stopClock: () => actions.stopClock(),
+    toEnd: () => ph === "final-clue" && actions.toEnd()
+  }[a];
+  if (ok) { ok(); schedulePublish(); }
+}
+
+// ---- host remote (phone side) ----
+const rm = { view: null, ping: null };
+function remoteUser() {
+  if (rm.ping) { clearInterval(rm.ping); rm.ping = null; }
+  rm.view = null;
+  if (!cloud.user) { renderRemote(); return; }
+  const vref = userRef("remote/view"); cloud.refs.push(vref);
+  vref.on("value", sn => {
+    rm.view = sn.val();
+    if (rm.view && rm.view.clock) rm.view.clock.ends = Date.now() + (+rm.view.clock.left || 0);
+    renderRemote();
+  }, () => { rm.view = null; renderRemote(); });
+  const ping = () => userRef("remote/ping").set(firebase.database.ServerValue.TIMESTAMP).catch(() => {});
+  ping(); rm.ping = setInterval(ping, 10000);
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && cloud.user) ping(); });
+  renderRemote();
+}
+function sendCmd(a, d) {
+  if (!cloud.user) return;
+  userRef("remote/cmd").push({ a, d: d || {}, at: firebase.database.ServerValue.TIMESTAMP }).catch(() => toast("Couldn't reach your host screen."));
+  if (navigator.vibrate) navigator.vibrate(12);
+}
+const rTeam = (v, id) => (v.teams || []).find(t => t.id === id);
+function rClock(v) {
+  const c = v.clock; if (!c) return "";
+  const left = Math.max(0, (c.ends || Date.now()) - Date.now());
+  const lab = { buzz: "Buzz in", steal: "Buzz in", answer: "Answer", stealAnswer: "Answer", dd: "Answer" }[c.kind] || "Timer";
+  return `<div class="r-clock ${c.up ? "up" : ""}"><span>${c.up ? "Time's up" : lab}</span><b id="rsec">${c.up ? 0 : Math.ceil(left / 1000)}</b><button class="linkbtn" data-r="stopClock">Stop</button></div>`;
+}
+function rScores(v) {
+  return `<div class="r-scores">${asArr(v.teams).map(t => `<div class="r-team ${v.turn === t.id && (v.phase === "board" || v.phase === "clue") ? "turn" : ""}" style="--c:${t.color}">
+    <span class="dot" style="background:${t.color}"></span><span class="nm">${esc(t.name)}${v.turn === t.id && (v.phase === "board" || v.phase === "clue") ? ' <em>Turn</em>' : ""}</span>
+    <b class="${t.score < 0 ? "neg" : ""}">${money(t.score)}</b>
+    <button data-r="adj" data-t="${t.id}" data-d="-100" aria-label="${esc(t.name)} minus 100">−</button><button data-r="adj" data-t="${t.id}" data-d="100" aria-label="${esc(t.name)} plus 100">+</button></div>`).join("")}</div>`;
+}
+function rAnswer(v, a) { return `<div class="r-ans"><small>Answer, only you can see this</small><b>${esc(a || "No answer written")}</b></div>`; }
+function rClueCard(v) {
+  const c = v.clue; if (!c) return "";
+  return `<div class="r-card"><div class="r-meta"><span>${esc(c.cat)}</span><b>${v.dd ? "Daily Double " + money(v.dd.wager || 0) : money(c.value)}</b></div>
+    ${c.img ? `<div class="r-img"><img data-img="${esc(c.img)}" alt=""></div>` : ""}${c.q ? `<p class="r-q">${esc(c.q)}</p>` : ""}</div>`;
+}
+function renderRemote() {
+  const root = $("#app");
+  const ae = document.activeElement;
+  if (ae && root.contains(ae) && ae.tagName === "INPUT") { rm.pending = true; return; }
+  rm.pending = false;
+  const head = `<div class="rtop">${markHTML("remote")}${cloud.user ? `<button class="linkbtn" data-act="signOut">Sign out</button>` : ""}</div>`;
+  let body = "";
+  const v = rm.view;
+  if (cloud.failed) body = `<div class="r-empty"><h1>Can't load</h1><p>Check your internet connection and reload this page.</p></div>`;
+  else if (!cloud.user) body = `<div class="r-empty"><h1>Host remote</h1><p>Sign in with the Google account you host with. The remote only opens for that account, so players can't use it.</p><button class="btn gbtn big" data-act="signIn">${G_ICON}Sign in with Google</button></div>`;
+  else if (!v || v.idle) body = `<div class="r-empty"><h1>Ready</h1><p>Signed in as ${esc(cloud.user.email || "you")}. Start a game on your host screen and this remote will light up.</p><p class="muted">Make sure the host screen is signed in with this same account.</p></div>`;
+  else {
+    const ph = v.phase, teams = asArr(v.teams);
+    if (ph === "board") {
+      const b = v.board || {}, cats = asArr(b.cats), cells = asArr(b.cells).map(asArr);
+      body = `<div class="r-sec"><div class="r-lab">Whose turn</div><div class="r-chips">${teams.map(t => `<button class="${v.turn === t.id ? "sel" : ""}" data-r="turn" data-t="${t.id}"><span class="dot" style="background:${t.color}"></span>${esc(t.name)}</button>`).join("")}<button class="${!v.turn ? "sel" : ""}" data-r="turn" data-t="">Nobody</button></div></div>
+        ${b.done ? `<button class="btn gold big r-wide" data-r="next">${esc(b.next)}</button>`
+          : `<div class="r-board" style="--cols:${cats.length}">${cats.map(c => `<div class="r-cat">${esc(c || "—")}</div>`).join("")}${(() => { const rows = Math.max(0, ...cells.map(c => c.length)); let h = ""; for (let i = 0; i < rows; i++) cells.forEach((col, ci) => { const x = col[i]; h += !x || x.st !== "o" ? `<button class="r-tile" disabled></button>` : `<button class="r-tile" data-r="open" data-c="${ci}" data-i="${i}">$${x.v}</button>`; }); return h; })()}</div>`}`;
+    } else if (ph === "dd") {
+      const d = v.dd || {};
+      body = `${rClueCard(Object.assign({}, v, { clue: Object.assign({}, v.clue, { q: "", img: "" }) }))}<div class="r-sec"><div class="r-lab">Daily Double: who found it?</div><div class="r-chips">${teams.map(t => `<button class="${d.team === t.id ? "sel" : ""}" data-r="ddTeam" data-t="${t.id}"><span class="dot" style="background:${t.color}"></span>${esc(t.name)}</button>`).join("")}</div>
+        ${d.team ? `<label class="r-input">Wager (up to ${money(d.max || 0)})<input type="number" inputmode="numeric" id="rwager" min="5" max="${d.max || 0}" step="100" value="${d.wager || ""}"></label>
+        <p class="muted" style="margin:.2rem 0 .6rem">${d.penalty ? "A wrong answer takes the wager off." : "No penalty for a wrong answer."}</p>
+        <button class="btn gold big r-wide" data-r="ddGo">Show the clue</button>` : ""}</div>
+        ${rAnswer(v, v.clue && v.clue.a)}`;
+    } else if (ph === "clue") {
+      const b = v.buzz || {}, res = b.res || {}, w = b.winner, answered = asArr(b.answered), elig = asArr(b.eligible);
+      const wt = w && rTeam(v, w.team);
+      let status = "";
+      if (b.solved) status = `<div class="r-status ok">Answered correctly</div>`;
+      else if (w && wt) status = `<div class="r-who" style="--c:${wt.color}"><small>${w.kind === "turn" ? "Their turn" : "Buzzed in"}</small><b>${esc(wt.name)}</b>${w.name ? `<span>${esc(w.name)}</span>` : ""}
+          <div class="r-yn"><button class="ok" data-r="judge" data-t="${w.team}" data-v="right">✓ Correct</button><button class="no" data-r="judge" data-t="${w.team}" data-v="wrong">✗ Wrong</button></div></div>`;
+      else if (b.open) status = `<div class="r-status live">Buzzers open for ${elig.map(id => esc((rTeam(v, id) || {}).name || "")).join(", ")}</div><button class="btn r-wide" data-r="buzz">Close buzzers</button>`;
+      else if (b.timedOut) status = `<div class="r-status">Time's up. No one buzzed in.</div>${b.canOpen ? `<button class="btn r-wide" data-r="buzz">Reopen buzzers</button>` : ""}`;
+      else if (b.canOpen) status = `<button class="btn gold big r-wide" data-r="buzz">Open buzzers</button>`;
+      else if (answered.length && !elig.length) status = `<div class="r-status">Every team has missed.</div>`;
+      body = `${rClueCard(v)}${rAnswer(v, v.clue && v.clue.a)}${rClock(v)}${status}
+        <div class="r-sec"><div class="r-lab">Score any team</div><div class="r-judge">${teams.map(t => `<div><span class="dot" style="background:${t.color}"></span>${esc(t.name)}<button class="${res[t.id] === "right" ? "sel ok" : ""}" data-r="judge" data-t="${t.id}" data-v="right">✓</button><button class="${res[t.id] === "wrong" ? "sel no" : ""}" data-r="judge" data-t="${t.id}" data-v="wrong">✗</button></div>`).join("")}</div></div>
+        <div class="r-actions"><button class="btn" data-r="reveal">${v.show ? "Hide answer on TV" : "Reveal answer on TV"}</button><button class="btn gold" data-r="back">Back to board</button></div>
+        ${b.canSuck ? `<button class="suckbtn ${b.allMissed ? "" : "quiet"}" data-r="suck">You all suck</button>` : ""}`;
+    } else if (ph === "suck") {
+      const k = v.suck || {}, wt = k.winner && rTeam(v, k.winner);
+      body = `<div class="r-card"><div class="r-meta"><span>Mini game</span><b>${money(k.value || 0)}</b></div></div>${rAnswer(v, v.clue && v.clue.a)}
+        ${k.stage === "done" ? `<div class="r-status ${wt ? "ok" : ""}">${wt ? esc(wt.name) + " takes " + money(k.value || 0) : esc(k.reason || "Nobody gets it")}</div>
+            <div class="r-actions"><button class="btn" data-r="suckUndo">Undo</button><button class="btn gold" data-r="suckDone">Back to board</button></div>`
+          : k.stage === "ready" || k.stage === "go" ? `<div class="r-status live">Quick Draw is running on the phones…</div>`
+          : `<div class="r-sec"><div class="r-lab">Who won it?</div><div class="r-chips big">${teams.map(t => `<button data-r="suckAward" data-t="${t.id}"><span class="dot" style="background:${t.color}"></span>${esc(t.name)}</button>`).join("")}</div></div>
+            <div class="r-actions"><button class="btn" data-r="suckNobody">Nobody gets it</button></div>`}
+        <button class="btn r-wide" data-r="suckReveal">${v.show ? "Hide answer on TV" : "Reveal answer on TV"}</button>`;
+    } else if (ph === "final-cat") {
+      body = `<div class="r-card"><div class="r-meta"><span>Final Jeopardy</span></div><p class="r-q big">${esc((v.fin || {}).cat || "")}</p></div><button class="btn gold big r-wide" data-r="finWagers">Take wagers</button>`;
+    } else if (ph === "final-wager") {
+      const f = v.fin || {}, wg = f.wagers || {};
+      body = `<div class="r-card"><div class="r-meta"><span>Final Jeopardy</span><b>${esc(f.cat || "")}</b></div></div>
+        <div class="r-sec">${teams.map(t => { const max = Math.max(0, t.score); return `<label class="r-input"><span><span class="dot" style="background:${t.color}"></span> ${esc(t.name)} (up to ${money(max)})</span><input type="number" inputmode="numeric" data-rw="${t.id}" min="0" max="${max}" step="100" value="${wg[t.id] ?? ""}" ${max === 0 ? "disabled" : ""}></label>`; }).join("")}</div>
+        <button class="btn gold big r-wide" data-r="finClue">Show the clue</button>`;
+    } else if (ph === "final-clue") {
+      const f = v.fin || {}, wg = f.wagers || {}, rs = f.res || {};
+      body = `<div class="r-card"><div class="r-meta"><span>Final Jeopardy</span><b>${esc(f.cat || "")}</b></div><p class="r-q">${esc(f.q || "")}</p></div>${rAnswer(v, f.a)}
+        <div class="r-actions"><button class="btn" data-r="timer">${f.running ? "Stop timer" : "Start timer"}</button><button class="btn" data-r="reveal">${v.show ? "Hide answer on TV" : "Reveal answer on TV"}</button></div>
+        <div class="r-sec"><div class="r-lab">Judge each team</div><div class="r-judge">${teams.map(t => `<div><span class="dot" style="background:${t.color}"></span>${esc(t.name)} <small>${money(+wg[t.id] || 0)}</small><button class="${rs[t.id] === "right" ? "sel ok" : ""}" data-r="finJudge" data-t="${t.id}" data-v="right">✓</button><button class="${rs[t.id] === "wrong" ? "sel no" : ""}" data-r="finJudge" data-t="${t.id}" data-v="wrong">✗</button></div>`).join("")}</div></div>
+        <button class="btn gold big r-wide" data-r="toEnd">Final scores</button>`;
+    } else if (ph === "end") {
+      const sorted = [...teams].sort((a, b) => b.score - a.score);
+      body = `<div class="r-empty"><h1>${esc(sorted[0] ? sorted[0].name : "")} wins</h1><p>Use the host screen to play again or go back to your games.</p></div>`;
+    }
+    body = `<div class="r-title">${esc(v.title || "")}</div>${body}${rScores(v)}`;
+  }
+  root.innerHTML = `<div class="remote">${head}${body}</div>`;
+  hydrateImages(root);
+}
+setInterval(() => { if (app.role === "remote" && rm.view && rm.view.clock) { const el = $("#rsec"); if (el && !rm.view.clock.up) el.textContent = Math.ceil(Math.max(0, rm.view.clock.ends - Date.now()) / 1000); } if (app.role === "remote" && rm.pending && !(document.activeElement && document.activeElement.tagName === "INPUT")) renderRemote(); }, 250);
+document.addEventListener("click", e => {
+  if (app.role !== "remote") return;
+  const b = e.target.closest("[data-r]"); if (!b || b.disabled) return;
+  const a = b.dataset.r, d = { t: b.dataset.t, v: b.dataset.v, c: b.dataset.c, i: b.dataset.i, d: b.dataset.d };
+  if (a === "ddGo") { const el = $("#rwager"); const w = Math.round(+(el && el.value)); const max = +((rm.view.dd || {}).max || 0); if (!(w >= 5 && w <= max)) { toast(`Enter a wager between $5 and ${money(max)}.`); return; } d.w = w; }
+  sendCmd(a, d);
+});
+document.addEventListener("change", e => {
+  if (app.role !== "remote") return;
+  const el = e.target; if (el.dataset && el.dataset.rw) sendCmd("finWager", { t: el.dataset.rw, w: el.value === "" ? "" : Math.max(0, Math.round(+el.value)) });
+});
+
 // ---------- events ----------
 const actions = {
   new() { const g = newGame(); app.games[g.id] = g; scheduleSave(g); app.editId = g.id; app.tab = 0; app.view = "editor"; render(); },
@@ -3891,6 +4382,8 @@ const actions = {
     try {
       const g = JSON.parse($("#imp").value);
       if (!g || !Array.isArray(g.rounds) || !g.rounds[0] || !Array.isArray(g.rounds[0].cats)) throw 0;
+      if (g._images && typeof g._images === "object") for (const [id, v] of Object.entries(g._images)) if (typeof v === "string" && v.startsWith("data:image/")) putImage(id, v);
+      delete g._images;
       const fresh = Object.assign(newGame(), g, { id: "g" + rid(), updated: Date.now() });
       if (!fresh.rounds[1]) fresh.rounds[1] = blankRound("Double Jeopardy", 400);
       fresh.final = Object.assign({ cat: "", q: "", a: "" }, fresh.final || {});
@@ -3940,17 +4433,23 @@ const actions = {
   full() { if (document.fullscreenElement) document.exitFullscreen().catch(() => {}); else goFull(); },
   open(d) { openClue(+d.c, +d.i); },
   back() { backToBoard(); },
-  reveal() { const s = app.session; s.show = !s.show; saveSession(); const a = $("#ans"); if (a) a.classList.toggle("on", s.show); renderScores(); },
+  reveal() { const s = app.session; s.show = !s.show; saveSession(); const a = $("#ans"); if (a) a.classList.toggle("on", s.show); renderScores(); fitClue(); },
   buzzToggle() { toggleBuzz(); },
   judge(d) { judge(d.t, d.v); },
   adj(d) { applyDelta(d.t, +d.d); saveSession(); renderScores(); broadcast(); },
   ddTeam(d) { app.session.dd.team = d.t; saveSession(); refreshMain(); const w = $("#ddw"); if (w) w.focus(); },
-  ddGo() {
-    const s = app.session, t = teamById(s.dd.team), maxW = Math.max(...s.rounds[s.round].cats.flatMap(c => c.clues.map(x => x.value)));
-    const max = Math.max(t.score, maxW), w = Math.round(+$("#ddw").value);
+  ddGo(d) {
+    const s = app.session, t = teamById(s.dd.team); if (!t) { toast("Pick the team first."); return; }
+    const maxW = Math.max(...s.rounds[s.round].cats.flatMap(c => c.clues.map(x => x.value)));
+    const max = Math.max(t.score, maxW), w = Math.round(d && d.w !== undefined && !isNaN(d.w) ? +d.w : +($("#ddw") || {}).value);
     if (!(w >= 5 && w <= max)) { toast(`Enter a wager between $5 and ${money(max)}.`); return; }
     s.dd.wager = w; s.phase = "clue"; startClock("dd"); saveSession(); refreshMain(); broadcast();
   },
+  signIn() { signIn(); },
+  signOut() { signOut(); },
+  showRemote() { app.modal = { type: "remote" }; renderModal(); },
+  toggleCtrl() { app.showCtrl = !app.showCtrl; updateRemotePill(); },
+  removePhoto() { const m = app.modal, g = app.games[app.editId], cl = g.rounds[app.tab].cats[m.c].clues[m.i]; delete cl.img; scheduleSave(g); renderModal(); refreshCard(m.c, m.i); },
   setTurn(d) {
     const s = app.session, t = d.t || null;
     if (s.phase === "board") { s.turn = t; saveSession(); renderScores(); broadcast(); return; }
@@ -4037,9 +4536,9 @@ document.addEventListener("input", e => {
     const k = bind.slice(5);
     if (el.type === "checkbox") { app.rules[k] = el.checked; const tg = $("#timerGrid"); if (k === "timers" && tg) tg.classList.toggle("off", !el.checked); }
     else app.rules[k] = Math.max(1, Math.min(120, Math.round(+el.value) || 1));
-    LS.set("jp.rules", app.rules); return;
+    LS.set("jp.rules", app.rules); cloudSaveSettings(); return;
   }
-  if (bind === "teamName") { app.teams[+el.dataset.i].name = el.value; LS.set("jp.teams", app.teams); broadcast(); return; }
+  if (bind === "teamName") { app.teams[+el.dataset.i].name = el.value; LS.set("jp.teams", app.teams); broadcast(); clearTimeout(app.setT); app.setT = setTimeout(cloudSaveSettings, 800); return; }
   if (bind === "ddWager") { app.session.dd.wager = +el.value || 0; saveSession(); return; }
   if (bind === "finWager") { app.session.fin.wagers[el.dataset.t] = el.value === "" ? "" : +el.value; saveSession(); return; }
   const g = app.games[app.editId]; if (!g) return;
@@ -4055,12 +4554,21 @@ document.addEventListener("input", e => {
   scheduleSave(g);
 });
 document.addEventListener("change", e => {
+  if (e.target.id === "photoIn" && e.target.files && e.target.files[0]) { attachPhoto(e.target.files[0]); return; }
   if (e.target.dataset.actChange === "turnMode") { app.rules.turnMode = e.target.value; LS.set("jp.rules", app.rules); return; }
   if (e.target.dataset.actChange === "values") {
     const g = app.games[app.editId], base = +e.target.value;
     g.rounds[app.tab].cats.forEach(c => c.clues.forEach((cl, i) => cl.value = base * (i + 1)));
     scheduleSave(g); render();
   }
+});
+document.addEventListener("dragover", e => { if (e.target.closest && e.target.closest("#photoDrop")) { e.preventDefault(); e.target.closest("#photoDrop").classList.add("over"); } });
+document.addEventListener("dragleave", e => { const d = e.target.closest && e.target.closest("#photoDrop"); if (d) d.classList.remove("over"); });
+document.addEventListener("drop", e => { const d = e.target.closest && e.target.closest("#photoDrop"); if (!d) return; e.preventDefault(); d.classList.remove("over"); const f = e.dataTransfer.files && e.dataTransfer.files[0]; if (f) attachPhoto(f); });
+document.addEventListener("paste", e => {
+  if (!app.modal || app.modal.type !== "clue") return;
+  const item = [...(e.clipboardData ? e.clipboardData.items : [])].find(i => i.type.startsWith("image/"));
+  if (item) { e.preventDefault(); attachPhoto(item.getAsFile()); }
 });
 document.addEventListener("keydown", e => {
   if (app.role === "player") {
@@ -4086,7 +4594,9 @@ window.addEventListener("pagehide", () => { if (app.role === "player" && net.mod
     const sm = /[#&?]s=([A-Za-z0-9.-]+)/.exec(location.hash + location.search);
     if (m) { app.role = "player"; startPlayerWithCode(m[1].toUpperCase(), sm ? sm[1] : ""); return; }
     if (/[#?]join\b/.test(location.hash + location.search)) { app.role = "player"; app.needCode = true; renderPlayer(); return; }
+    if (/[#?]remote\b/.test(location.hash + location.search)) { app.role = "remote"; renderRemote(); cloudInit(); return; }
     app.role = "host";
+    cloudInit();
     if (!Object.keys(app.games).length && !LS.get("jp.seeded", false)) { const g = sampleGame(); app.games[g.id] = g; persistLocal(); LS.set("jp.seeded", true); }
     setSync("Saved in this browser");
     startHostNet(); render();
