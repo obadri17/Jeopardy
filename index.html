@@ -536,6 +536,9 @@ kbd{font:600 .68rem var(--f);color:var(--dim);border:1px solid var(--hair);borde
 .stage.remote-on .suckstage .choose,.stage.remote-on .suckstage .row,.stage.remote-on .suckstage .suckq,.stage.remote-on .qdlink,
 .stage.remote-on .ddstage .choose,.stage.remote-on .ddstage .wagers,.stage.remote-on .ddstage .btn,.stage.remote-on .ddstage .ddnote,.stage.remote-on .ddstage .who,
 .stage.remote-on .wagers,.stage.remote-on .face > .btn,.stage.remote-on .round-done .btn,.stage.remote-on .pod .adj{display:none}
+.r-notice{border-radius:12px;padding:.75rem .9rem;background:rgba(255,95,95,.12);border:1px solid rgba(255,95,95,.45);color:#FFD1D1;font-size:.9rem;line-height:1.4}
+.remote button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.remote button.sending{opacity:.6}
 
 </style>
 </head>
@@ -4036,15 +4039,21 @@ function cloudInit() {
   return cloud.loading;
 }
 const serverNow = () => Date.now() + (cloud.offset || 0);
-async function signIn() {
-  await cloudInit();
-  if (!cloud.ready) { toast("Sign-in couldn't load. Check your internet and try again."); return; }
-  const p = new firebase.auth.GoogleAuthProvider(); p.setCustomParameters({ prompt: "select_account" });
-  try { await cloud.auth.signInWithPopup(p); }
-  catch (e) {
-    if (e && (e.code === "auth/popup-blocked" || e.code === "auth/operation-not-supported-in-this-environment")) { try { await cloud.auth.signInWithRedirect(p); } catch { toast("Sign-in didn't work. Try again."); } }
-    else if (e && e.code !== "auth/popup-closed-by-user" && e.code !== "auth/cancelled-popup-request") toast("Sign-in didn't work: " + (e.message || "try again"));
+function signIn() {
+  if (!cloud.ready) {
+    toast("Getting sign-in ready…", 2000);
+    cloudInit().then(ok => toast(ok ? "Ready. Tap Sign in with Google again." : "Sign-in couldn't load. Check your internet and reload."));
+    return;
   }
+  const p = new firebase.auth.GoogleAuthProvider(); p.setCustomParameters({ prompt: "select_account" });
+  cloud.auth.signInWithPopup(p).catch(e => {
+    const c = e && e.code;
+    if (c === "auth/popup-closed-by-user" || c === "auth/cancelled-popup-request") return;
+    if (c === "auth/popup-blocked") toast("Your browser blocked the Google sign-in window. Allow pop-ups for this site, then tap Sign in again.", 6000);
+    else if (c === "auth/operation-not-supported-in-this-environment") cloud.auth.signInWithRedirect(p).catch(() => toast("Sign-in isn't supported in this browser. Open the page in Safari or Chrome."));
+    else if (c === "auth/unauthorized-domain") toast("This web address isn't approved for sign-in yet.", 6000);
+    else toast("Sign-in didn't work: " + ((e && e.message) || "try again"), 6000);
+  });
 }
 function signOut() { if (cloud.auth) cloud.auth.signOut(); }
 const userRef = path => cloud.db.ref(`users/${cloud.user.uid}/${path}`);
@@ -4162,7 +4171,7 @@ async function attachPhoto(file) {
 let pubTimer = null;
 function schedulePublish() { if (!cloud.user || app.role !== "host") return; clearTimeout(pubTimer); pubTimer = setTimeout(publishRemote, 80); }
 function remoteView() {
-  const s = app.session, base = { at: firebase.database.ServerValue.TIMESTAMP };
+  const s = app.session, base = { at: firebase.database.ServerValue.TIMESTAMP, ack: app.lastAck || "", ackOk: app.lastAckOk !== false };
   if (!s || app.view !== "play") return Object.assign(base, { idle: true, view: app.view });
   const maxW = s.rounds[s.round] ? Math.max(...s.rounds[s.round].cats.flatMap(c => c.clues.map(x => x.value))) : 0;
   const v = Object.assign(base, { idle: false, title: s.title, phase: s.phase, round: s.round, turn: s.turn || "", show: !!s.show,
@@ -4196,9 +4205,11 @@ function hostRemoteListen() {
   if (app.role !== "host" || !cloud.user) return;
   const cmdRef = userRef("remote/cmd"); cloud.refs.push(cmdRef);
   cmdRef.on("child_added", snap => {
-    const c = snap.val(); snap.ref.remove();
-    if (!c || !c.a || serverNow() - (c.at || 0) > 20000) return;
-    runRemote(c.a, c.d || {});
+    const c = snap.val(), key = snap.key; snap.ref.remove();
+    if (!c || !c.a) return;
+    if (typeof c.at === "number" && serverNow() - c.at > 60000) return;   // leftover from an earlier session
+    const done = runRemote(c.a, c.d || {});
+    app.lastAck = key; app.lastAckOk = done !== false; publishRemote();
   });
   const pingRef = userRef("remote/ping"); cloud.refs.push(pingRef);
   pingRef.on("value", sn => { const t = sn.val(); if (t && serverNow() - t < 25000) { remoteSeen = Date.now(); updateRemotePill(); } });
@@ -4213,7 +4224,7 @@ function updateRemotePill() {
 }
 const remotePillHTML = () => cloud.user ? (remoteOn() ? `<button class="pill on" id="rpill" data-act="toggleCtrl">Remote connected${app.showCtrl ? ", hide TV controls" : ", show TV controls"}</button>` : `<button class="pill" id="rpill" data-act="showRemote">Host remote</button>`) : (IN_CLAUDE ? `<span id="rpill"></span>` : `<button class="pill" id="rpill" data-act="showRemote">Host remote</button>`);
 function runRemote(a, d) {
-  const s = app.session; if (!s || app.view !== "play") return;
+  const s = app.session; if (!s || app.view !== "play") return false;
   const ph = s.phase;
   const ok = {
     open: () => ph === "board" && !roundDone(s.round) && (() => { const cl = s.rounds[s.round].cats[+d.c] && s.rounds[s.round].cats[+d.c].clues[+d.i]; return cl && (cl.q.trim() || cl.img) && !s.used[`${s.round}-${+d.c}-${+d.i}`]; })() && openClue(+d.c, +d.i),
@@ -4240,7 +4251,9 @@ function runRemote(a, d) {
     stopClock: () => actions.stopClock(),
     toEnd: () => ph === "final-clue" && actions.toEnd()
   }[a];
-  if (ok) { ok(); schedulePublish(); }
+  if (!ok) return false;
+  const r = ok(); schedulePublish();
+  return r !== false;
 }
 
 // ---- host remote (phone side) ----
@@ -4253,6 +4266,7 @@ function remoteUser() {
   vref.on("value", sn => {
     rm.view = sn.val();
     if (rm.view && rm.view.clock) rm.view.clock.ends = Date.now() + (+rm.view.clock.left || 0);
+    if (rm.wait && rm.view && rm.view.ack === rm.wait.key) { rm.wait = null; rm.notice = rm.view.ackOk === false ? "That button doesn't apply right now, so the host screen ignored it." : ""; }
     renderRemote();
   }, () => { rm.view = null; renderRemote(); });
   const ping = () => userRef("remote/ping").set(firebase.database.ServerValue.TIMESTAMP).catch(() => {});
@@ -4260,10 +4274,25 @@ function remoteUser() {
   document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && cloud.user) ping(); });
   renderRemote();
 }
-function sendCmd(a, d) {
+function sendCmd(a, d, btn) {
   if (!cloud.user) return;
-  userRef("remote/cmd").push({ a, d: d || {}, at: firebase.database.ServerValue.TIMESTAMP }).catch(() => toast("Couldn't reach your host screen."));
+  const ref = userRef("remote/cmd").push();
+  const key = ref.key;
+  rm.wait = { key, a }; rm.notice = "";
+  if (btn) btn.classList.add("sending");
+  const fail = err => { rm.wait = null; rm.notice = "Couldn't send that: " + ((err && err.message) || "check your internet"); renderRemote(true); };
+  // the database rejects any field that's undefined, so strip those before sending
+  try { const payload = JSON.parse(JSON.stringify({ a, d: d || {} })); payload.at = firebase.database.ServerValue.TIMESTAMP; ref.set(payload).catch(fail); }
+  catch (err) { fail(err); }
   if (navigator.vibrate) navigator.vibrate(12);
+  setTimeout(() => {
+    if (rm.wait && rm.wait.key === key) {
+      rm.wait = null;
+      rm.notice = rm.view && !rm.view.idle ? "Your host screen didn't respond. Check that it's still open on the game screen, signed in as " + (cloud.user.email || "you") + ", and connected to the internet."
+        : "Your host screen isn't running a game. Start one there, signed in as " + (cloud.user.email || "you") + ".";
+      renderRemote(true);
+    }
+  }, 4000);
 }
 const rTeam = (v, id) => (v.teams || []).find(t => t.id === id);
 function rClock(v) {
@@ -4284,10 +4313,13 @@ function rClueCard(v) {
   return `<div class="r-card"><div class="r-meta"><span>${esc(c.cat)}</span><b>${v.dd ? "Daily Double " + money(v.dd.wager || 0) : money(c.value)}</b></div>
     ${c.img ? `<div class="r-img"><img data-img="${esc(c.img)}" alt=""></div>` : ""}${c.q ? `<p class="r-q">${esc(c.q)}</p>` : ""}</div>`;
 }
-function renderRemote() {
+function renderRemote(force) {
   const root = $("#app");
   const ae = document.activeElement;
   if (ae && root.contains(ae) && ae.tagName === "INPUT") { rm.pending = true; return; }
+  const sig = JSON.stringify([rm.view && Object.assign({}, rm.view, { at: 0, ack: 0, ackOk: 0, clock: rm.view.clock ? Object.assign({}, rm.view.clock, { left: 0, ends: 0 }) : null }), !!cloud.user, cloud.failed, rm.notice]);
+  if (!force && !rm.pending && sig === rm.sig && root.querySelector(".remote")) return;
+  rm.sig = sig;
   rm.pending = false;
   const head = `<div class="rtop">${markHTML("remote")}${cloud.user ? `<button class="linkbtn" data-act="signOut">Sign out</button>` : ""}</div>`;
   let body = "";
@@ -4352,7 +4384,7 @@ function renderRemote() {
     }
     body = `<div class="r-title">${esc(v.title || "")}</div>${body}${rScores(v)}`;
   }
-  root.innerHTML = `<div class="remote">${head}${body}</div>`;
+  root.innerHTML = `<div class="remote">${head}${rm.notice ? `<div class="r-notice" role="alert">${esc(rm.notice)}</div>` : ""}${body}</div>`;
   hydrateImages(root);
 }
 setInterval(() => { if (app.role === "remote" && rm.view && rm.view.clock) { const el = $("#rsec"); if (el && !rm.view.clock.up) el.textContent = Math.ceil(Math.max(0, rm.view.clock.ends - Date.now()) / 1000); } if (app.role === "remote" && rm.pending && !(document.activeElement && document.activeElement.tagName === "INPUT")) renderRemote(); }, 250);
@@ -4361,7 +4393,8 @@ document.addEventListener("click", e => {
   const b = e.target.closest("[data-r]"); if (!b || b.disabled) return;
   const a = b.dataset.r, d = { t: b.dataset.t, v: b.dataset.v, c: b.dataset.c, i: b.dataset.i, d: b.dataset.d };
   if (a === "ddGo") { const el = $("#rwager"); const w = Math.round(+(el && el.value)); const max = +((rm.view.dd || {}).max || 0); if (!(w >= 5 && w <= max)) { toast(`Enter a wager between $5 and ${money(max)}.`); return; } d.w = w; }
-  sendCmd(a, d);
+  Object.keys(d).forEach(k => d[k] === undefined && delete d[k]);
+  sendCmd(a, d, b);
 });
 document.addEventListener("change", e => {
   if (app.role !== "remote") return;
